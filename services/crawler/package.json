@@ -1,0 +1,18 @@
+{
+  "name": "crawler-service",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.ts",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.8",
+    "cheerio": "^1.2.0",
+    "dotenv": "^17.4.2",
+    "playwright": "^1.60.0",
+    "shared-types": "workspace:*",
+    "turndown": "^7.2.4"
+  },
+  "devDependencies": {
+    "@types/cheerio": "^1.0.0",
+    "@types/turndown": "^5.0.6"
+  }
+}

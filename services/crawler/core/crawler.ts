@@ -1,0 +1,109 @@
+import { chromium, Browser } from 'playwright';
+import { normalizeUrl, isSameDomain } from '../utils/urlUtils';
+import { extractPageData } from '../extractors/pageExtractor';
+import { saveCrawledPage } from '../storage/supabase';
+
+export interface CrawlerOptions {
+  projectId: string;
+  startUrl: string;
+  maxPages?: number;
+  maxDepth?: number;
+  concurrency?: number;
+}
+
+export class WebCrawler {
+  private visited = new Set<string>();
+  private queue: Array<{ url: string; depth: number }> = [];
+  private options: Required<CrawlerOptions>;
+  private activeCrawls = 0;
+  private pagesCrawled = 0;
+  private browser: Browser | null = null;
+
+  constructor(options: CrawlerOptions) {
+    this.options = {
+      maxPages: 30, // Limit to prevent infinite crawls
+      maxDepth: 3,  // Prevent crawling too deep
+      concurrency: 3, // Parallel pages
+      ...options
+    };
+  }
+
+  public async start(): Promise<number> {
+    const { startUrl } = this.options;
+    const normalizedStart = normalizeUrl(startUrl);
+    this.visited.add(normalizedStart);
+    this.queue.push({ url: normalizedStart, depth: 0 });
+    
+    this.browser = await chromium.launch({ headless: true });
+    
+    try {
+      await this.processQueue();
+    } finally {
+      await this.browser.close();
+    }
+    return this.pagesCrawled;
+  }
+
+  private async processQueue() {
+    while ((this.queue.length > 0 || this.activeCrawls > 0) && this.pagesCrawled < this.options.maxPages) {
+      if (this.queue.length === 0 || this.activeCrawls >= this.options.concurrency) {
+        await new Promise(r => setTimeout(r, 100)); // wait for active crawls
+        continue;
+      }
+
+      const item = this.queue.shift();
+      if (!item) continue;
+
+      this.activeCrawls++;
+      this.pagesCrawled++;
+      
+      this.crawlPage(item.url, item.depth).finally(() => {
+        this.activeCrawls--;
+      });
+    }
+
+    // Wait for remaining active crawls to finish gracefully
+    while (this.activeCrawls > 0) {
+      await new Promise(r => setTimeout(r, 100));
+    }
+  }
+
+  private async crawlPage(url: string, depth: number) {
+    console.log(`[Crawler] Visiting: ${url} (Depth: ${depth})`);
+    if (!this.browser) return;
+
+    const page = await this.browser.newPage();
+    
+    try {
+      // Basic rate limiting/politeness delay between requests
+      await new Promise(r => setTimeout(r, 500));
+      
+      const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
+      if (!response || !response.ok()) {
+        console.warn(`[Crawler] Failed or Redirected ${url}: ${response?.status()}`);
+        return;
+      }
+
+      const html = await page.content();
+      const extractedData = extractPageData(html, url);
+      
+      // Save directly to Supabase via our storage adapter
+      await saveCrawledPage(this.options.projectId, extractedData);
+
+      // Add discovered links to queue if within depth limit
+      if (depth < this.options.maxDepth) {
+        for (const link of extractedData.links) {
+          const normalized = normalizeUrl(link);
+          if (isSameDomain(this.options.startUrl, normalized) && !this.visited.has(normalized)) {
+            this.visited.add(normalized); // Prevent duplicate queuing
+            this.queue.push({ url: normalized, depth: depth + 1 });
+          }
+        }
+      }
+    } catch (error) {
+      console.error(`[Crawler] Error crawling ${url}:`, error instanceof Error ? error.message : error);
+    } finally {
+      await page.close();
+    }
+  }
+}
