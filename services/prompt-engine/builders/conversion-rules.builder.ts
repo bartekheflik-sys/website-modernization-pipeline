@@ -14,6 +14,10 @@ CTA QUALITY ASSESSMENT: ${ux_analysis.cta_quality}
 CONVERSION GOALS (implement ALL of these):
 ${lovable_prompt_data.conversion_goals.map((g, i) => `${i + 1}. ${g}`).join('\n')}
 
+STRICT FIDELITY LOCK:
+- NEVER add new pages, forms, or "Online Order" systems if they break the original bookmark structure.
+- Modernize existing CTAs, but do not invent new ones that require backend functionality (like ordering) if not present in the original.
+
 MISSING ELEMENTS TO ADD (CRITICAL — these were absent in original site):
 ${ux_analysis.missing_elements.map(e => `- ${e}`).join('\n')}
 

@@ -61,11 +61,17 @@ export function buildSectionSpecs(analysis: AIAnalysisOutput): string {
 C. SECTION-LEVEL SPECIFICATION
 ==================================================
 
+AVAILABLE MEDIA ASSETS (USE THESE ORIGINAL PHOTOS):
+${lovable_prompt_data.media_assets?.product_images?.length ? `- PRODUCT PHOTOS: ${lovable_prompt_data.media_assets.product_images.join(', ')}` : ''}
+${lovable_prompt_data.media_assets?.brand_images?.length ? `- BRAND/FACILITY PHOTOS: ${lovable_prompt_data.media_assets.brand_images.join(', ')}` : ''}
+${lovable_prompt_data.media_assets?.location_images?.length ? `- LOCATION PHOTOS: ${lovable_prompt_data.media_assets.location_images.join(', ')}` : ''}
+${lovable_prompt_data.media_assets?.logo_url ? `- BRAND LOGO: ${lovable_prompt_data.media_assets.logo_url}` : ''}
+${!lovable_prompt_data.media_assets?.product_images?.length && !lovable_prompt_data.media_assets?.brand_images?.length ? '- Use high-quality industry-standard placeholder images for products ONLY IF no assets are listed above.' : ''}
+
 UNIVERSAL SECTION RULES:
-- Every section must have clear visual separation (padding, background shift, or divider)
-- H2 section titles: centered for full-width, left-aligned for content sections
-- Each section has ONE purpose — no multi-purpose sections
-- Default animation: ${sectionAnimations}
+- Use original LOGO URL in Footer and Navigation.
+- Prioritize using ORIGINAL PRODUCT PHOTOS from the list above in the Services and Product sections.
+- If an image from the list matches a service/product by context, use it.
 
 STANDARD SECTION TEMPLATES:
 
@@ -74,26 +80,14 @@ HERO (every page):
 - Content order: H1 → Subheadline → Primary CTA → Trust signal
 - Headline must be benefit-driven, NOT feature-driven
 - CTA: Large, high-contrast, action verb
+${lovable_prompt_data.media_assets?.brand_images?.[0] ? `- IMAGE: Use "${lovable_prompt_data.media_assets.brand_images[0]}" for the hero visual.` : ''}
 
 SERVICES/PRODUCTS GRID:
 - 3-col desktop | 2-col tablet | 1-col mobile
 - Icon + Title + 2-line description + "Learn More" per card
 - Hover: translateY(-4px) + shadow
-
-TRUST/ABOUT:
-- 60/40 split: text left, visual right
-- Include founding year, certifications, key stat
-- Trust signals directly below hero
-
-CONTACT/CTA:
-- Centered, max-width 600px, brand-color background
-- Form: Name + Email + Message + Submit
-- Inline success message on submit
-
-FOOTER:
-- 4-col desktop | 2-col tablet | 1-col mobile
-- Logo + tagline | Nav links | Contact details | Copyright
-- Dark background, light text
+- MANDATORY IMAGE: Each card MUST use one of the original photos from the "AVAILABLE MEDIA ASSETS" list above.
+- HARD FORBIDDEN: It is strictly forbidden to use generic stock photos or AI-generated placeholders if real industry-specific photos (products, facility, work examples) are listed above. If you use a placeholder when a real URL is available, the generation is considered a failure.
 
 PAGE-SPECIFIC SECTION SPECS:
 

@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Analysis already in progress' }, { status: 409 });
     }
 
-    if (project.status !== 'crawled' && project.status !== 'analysis_complete' && project.status !== 'completed' && project.status !== 'pending') {
+    if (project.status !== 'crawled' && project.status !== 'analysis_complete' && project.status !== 'completed' && project.status !== 'pending' && project.status !== 'failed') {
       console.log(`[API Analyze] Rejection: Project status is ${project.status}`);
       return NextResponse.json(
         { error: `Project must be crawled before analysis. Current status: ${project.status}` },
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
 
     // Log Start
     await updateProjectStatus(projectId, 'analyzing');
-    await logPipelineStep(projectId, 'analysis', 'running', 'Starting AI website analysis via Gemini 1.5 Flash.');
+    await logPipelineStep(projectId, 'analysis', 'running', 'Starting AI website analysis via Gemini 2.0 Flash.');
 
     const result = await analyzeWebsiteData(projectId);
 

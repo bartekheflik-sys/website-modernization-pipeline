@@ -29,13 +29,13 @@ export function extractPageData(html: string, url: string): ExtractedPageData {
   const links: string[] = [];
   $('a[href]').each((_, el) => {
     let href = $(el).attr('href');
-    if (href) {
-      if (href.startsWith('/')) {
-        try {
-          href = new URL(href, url).toString();
-        } catch {}
+    if (href && !href.startsWith('mailto:') && !href.startsWith('tel:') && !href.startsWith('#')) {
+      try {
+        const absoluteUrl = new URL(href, url).toString();
+        links.push(absoluteUrl);
+      } catch {
+        links.push(href);
       }
-      links.push(href);
     }
   });
 
@@ -43,11 +43,9 @@ export function extractPageData(html: string, url: string): ExtractedPageData {
   $('img[src]').each((_, el) => {
     let src = $(el).attr('src');
     if (src) {
-      if (src.startsWith('/')) {
-        try {
-          src = new URL(src, url).toString();
-        } catch {}
-      }
+      try {
+        src = new URL(src, url).toString();
+      } catch {}
       let type: 'logo' | 'hero' | 'content' = 'content';
       const classOrId = ($(el).attr('class') || '') + ' ' + ($(el).attr('id') || '') + ' ' + src;
       const lower = classOrId.toLowerCase();

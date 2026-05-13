@@ -94,11 +94,17 @@ export class WebCrawler {
 
       // Add discovered links to queue if within depth limit
       if (depth < this.options.maxDepth) {
+        console.log(`[Crawler] Found ${extractedData.links.length} links on ${url}`);
         for (const link of extractedData.links) {
           const normalized = normalizeUrl(link);
-          if (isSameDomain(this.options.startUrl, normalized) && !this.visited.has(normalized)) {
+          const sameDomain = isSameDomain(this.options.startUrl, normalized);
+          const alreadyVisited = this.visited.has(normalized);
+          
+          if (sameDomain && !alreadyVisited) {
             this.visited.add(normalized); // Prevent duplicate queuing
             this.queue.push({ url: normalized, depth: depth + 1 });
+          } else if (!sameDomain) {
+            // console.log(`[Crawler] Skipping external link: ${normalized}`);
           }
         }
       }

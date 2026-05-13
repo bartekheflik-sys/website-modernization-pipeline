@@ -43,8 +43,12 @@ H. CONTENT PRESERVATION & STRUCTURE RULES
 PAGES FOUND IN ORIGINAL SITE:
 ${content_analysis.pages_detected.map(p => `- ${p}`).join('\n')}
 
-MISSING PAGES TO ADD (build these new):
+MISSING PAGES TO ADD (ZERO TOLERANCE — Do NOT add unless original was empty):
 ${content_analysis.missing_pages.map(p => `- ${p}`).join('\n')}
+
+STRICT NAVIGATION LOCK:
+- The bookmark list MUST be an EXACT 1:1 match of the original site's detected pages.
+- Do NOT add 'About Us', 'Online Order', or 'Reviews' if they did not exist in the source links.
 
 WEAK CONTENT AREAS TO STRENGTHEN:
 ${content_analysis.weak_content_areas.map(w => `- ${w}`).join('\n')}
@@ -53,7 +57,9 @@ NAVIGATION ISSUES TO FIX:
 ${content_analysis.navigation_issues.map(n => `- ${n}`).join('\n')}
 
 CONTENT RULES:
-- Rewrite existing content to be benefit-driven, not feature-driven
+- NO NEW PAGES: Do NOT add pages like 'Online Order' or 'About Us' if they were not in the original site bookmarks.
+- LITERAL CONTENT PRESERVATION: Specific blocks of text such as welcome messages ("Szanowni Państwo...") and delivery fee information ("6zł na osiedlu...") MUST be preserved exactly as they appear in the source data. Do not summarize or "modernize" these specific pieces of information.
+- Rewrite other existing content to be benefit-driven, not feature-driven
 - Every page must have a clear purpose statement in the hero
 - Replace all generic/weak headlines with action-oriented alternatives
 - Add subtext below every H2 section title (1–2 lines explaining the section purpose)

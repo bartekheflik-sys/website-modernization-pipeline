@@ -20,6 +20,10 @@ ${design_direction.ui_direction}
 
 BRAND STYLE: ${design_direction.brand_style}
 
+STRICT MEDIA HANDLING (MANDATORY):
+- LOGO: ${analysis.lovable_prompt_data.media_assets?.logo_url ? `Use this EXACT URL for the logo: ${analysis.lovable_prompt_data.media_assets.logo_url}. DO NOT use a placeholder or a generic icon. It is mandatory for the navigation and footer.` : 'Locate and use the original brand logo from the site data. If not found, use a high-end minimalist text-logo, but prioritize real assets.'}
+- REAL PHOTOGRAPHY: You MUST use the original photos provided in the section specs. Generic stock placeholders are forbidden if real assets (products, facility, team, work examples) are available.
+
 MODERNITY LEVEL:
 Build a state-of-the-art modern website, NOT a template. The output must feel premium, high-end, and polished. Every section must have intentional spacing, clear visual hierarchy, and professional typography.
 
@@ -46,5 +50,10 @@ ACCESSIBILITY:
 
 QUALITY GATE:
 Every section must be production-ready. No placeholder content. No "Lorem ipsum". Use industry-appropriate copy derived from the business context below.
+
+STRUCTURAL FIDELITY & NAVIGATION:
+- BREADCRUMBS & BACK NAVIGATION: Every sub-page (non-home) must include clear back-navigation (Breadcrumbs or a "Back to [Parent]" arrow/link) near the top of the page.
+- LANGUAGE CONSISTENCY: Maintain the exact multi-language structure if detected in the original (e.g. including a Language Switcher in the nav if /en/ or /hu/ paths were present).
+- NAVIGATION DEPTH: Mirror the original site's depth. If it was a deep multi-page site, do not flatten it into a single-page layout unless specifically instructed.
 `.trim();
 }

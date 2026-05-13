@@ -36,7 +36,14 @@ export const AIAnalysisSchema = z.object({
     design_style: z.string(),
     animation_style: z.string(),
     conversion_goals: z.array(z.string()),
-    must_include_elements: z.array(z.string())
+    must_include_elements: z.array(z.string()),
+    media_assets: z.object({
+      logo_url: z.string().optional(),
+      product_images: z.array(z.string()).optional(),
+      team_images: z.array(z.string()).optional(),
+      brand_images: z.array(z.string()).optional(),
+      location_images: z.array(z.string()).optional()
+    }).optional()
   })
 });
 
