@@ -9,6 +9,7 @@ export interface CrawlerOptions {
   maxPages?: number;
   maxDepth?: number;
   concurrency?: number;
+  targetTable?: 'pages' | 'modernized_pages';
 }
 
 export class WebCrawler {
@@ -24,6 +25,7 @@ export class WebCrawler {
       maxPages: 30, // Limit to prevent infinite crawls
       maxDepth: 3,  // Prevent crawling too deep
       concurrency: 3, // Parallel pages
+      targetTable: 'pages',
       ...options
     };
   }
@@ -88,7 +90,7 @@ export class WebCrawler {
       const extractedData = extractPageData(html, url);
       
       // Save directly to Supabase via our storage adapter
-      await saveCrawledPage(this.options.projectId, extractedData);
+      await saveCrawledPage(this.options.projectId, extractedData, this.options.targetTable);
 
       // Add discovered links to queue if within depth limit
       if (depth < this.options.maxDepth) {

@@ -11,9 +11,9 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-export async function saveCrawledPage(projectId: string, data: any) {
+export async function saveCrawledPage(projectId: string, data: any, table: string = 'pages') {
   const { error } = await supabase
-    .from('pages')
+    .from(table)
     .insert([
       {
         project_id: projectId,

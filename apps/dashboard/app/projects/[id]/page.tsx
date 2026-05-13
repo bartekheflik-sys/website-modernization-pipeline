@@ -1,17 +1,18 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { supabase } from '@/lib/supabase'
-import { Project, PipelineLog, PipelineError, AnalysisResult, GeneratedPrompt, StepStatus } from '@/types'
-import { PipelineStatus } from '@/components/pipeline-status'
-import { ControlPanel } from '@/components/control-panel'
-import { PromptViewer } from '@/components/prompt-viewer'
-import { AnalysisViewer } from '@/components/analysis-viewer'
-import { PipelineLogs, ErrorPanel } from '@/components/observability'
-import { Button } from '@/components/ui/button'
+import { supabase } from '../../../lib/supabase'
+import { Project, PipelineLog, PipelineError, AnalysisResult, GeneratedPrompt, StepStatus } from '../../../types'
+import { PipelineStatus } from '../../../components/pipeline-status'
+import { ControlPanel } from '../../../components/control-panel'
+import { PromptViewer } from '../../../components/prompt-viewer'
+import { AnalysisViewer } from '../../../components/analysis-viewer'
+import { PipelineLogs, ErrorPanel } from '../../../components/observability'
+import { Button } from '../../../components/ui/button'
 import { ChevronLeft, Globe, ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { QAComparison } from '../../../components/qa-comparison'
 
 export default function ProjectDetailPage() {
   const params = useParams()
@@ -67,12 +68,23 @@ export default function ProjectDetailPage() {
     }
   })
 
+  // 6. Fetch QA Report (Step 6)
+  const { data: qaReport, refetch: refetchQA } = useQuery({
+    queryKey: ['qa-report', id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('website_qa_reports').select('*').eq('project_id', id).order('created_at', { ascending: false }).limit(1).single()
+      if (error && error.code !== 'PGRST116') throw error
+      return data
+    }
+  })
+
   const refreshAll = () => {
     refetchProject()
     refetchLogs()
     refetchErrors()
     refetchAnalysis()
     refetchPrompt()
+    refetchQA()
   }
 
   // Derive step statuses from project status and logs
@@ -139,6 +151,7 @@ export default function ProjectDetailPage() {
         {/* Main Content (Left 2/3) */}
         <div className="lg:col-span-2 space-y-8">
           <PromptViewer prompt={prompt || null} />
+          <QAComparison projectId={id} modernizedUrl={project.modernized_url} />
           <AnalysisViewer analysis={analysis || null} />
         </div>
 

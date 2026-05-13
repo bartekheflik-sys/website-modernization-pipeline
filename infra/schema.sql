@@ -9,7 +9,19 @@ CREATE TABLE projects (
   url TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'pending',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  modernized_url TEXT
+);
+
+-- Modernized Pages table (Step 6)
+CREATE TABLE modernized_pages (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  url TEXT NOT NULL,
+  title TEXT,
+  markdown_content TEXT,
+  raw_json JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Pages table
@@ -114,3 +126,34 @@ CREATE POLICY "Allow public read access to pages" ON pages FOR SELECT USING (tru
 CREATE POLICY "Allow public read access to assets" ON assets FOR SELECT USING (true);
 CREATE POLICY "Allow public read access to prompts" ON prompts FOR SELECT USING (true);
 CREATE POLICY "Allow public read access to qa_reports" ON qa_reports FOR SELECT USING (true);
+
+-- Website QA Reports (Step 6)
+CREATE TABLE IF NOT EXISTS website_qa_reports (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+    old_site_crawl_id UUID,
+    new_site_crawl_id UUID,
+    qa_report_json JSONB NOT NULL,
+    overall_score INTEGER CHECK (overall_score >= 0 AND overall_score <= 100),
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Repair Prompts (Step 6)
+CREATE TABLE IF NOT EXISTS repair_prompts (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+    qa_report_id UUID REFERENCES website_qa_reports(id) ON DELETE CASCADE,
+    repair_prompt TEXT NOT NULL,
+    severity TEXT CHECK (severity IN ('low', 'medium', 'high', 'critical')),
+    status TEXT DEFAULT 'pending', -- pending, applied, rejected
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE website_qa_reports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE repair_prompts ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow public read access to website_qa_reports" ON website_qa_reports FOR SELECT USING (true);
+CREATE POLICY "Allow service role all on website_qa_reports" ON website_qa_reports USING (true);
+
+CREATE POLICY "Allow public read access to repair_prompts" ON repair_prompts FOR SELECT USING (true);
+CREATE POLICY "Allow service role all on repair_prompts" ON repair_prompts USING (true);

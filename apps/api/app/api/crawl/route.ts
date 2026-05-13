@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     projectId = body.projectId;
-    const { url } = body;
+    const { url, isModernized } = body;
 
     if (!projectId || !url) {
       return NextResponse.json({ error: 'projectId and url are required' }, { status: 400 });
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     await logPipelineStep(projectId, 'crawl', 'running', `Crawl triggered manually for ${url}`);
 
     // Since crawling takes a long time, we run it async in the background.
-    crawlWebsite(projectId, url).catch(async (err) => {
+    crawlWebsite(projectId, url, isModernized).catch(async (err) => {
       console.error('[Crawl Trigger Error]:', err);
       if (projectId) {
         await logPipelineError(projectId, 'crawler', err instanceof Error ? err.message : String(err));

@@ -15,6 +15,7 @@
     "@supabase/supabase-js": "^2.39.8",
     "crawler-service": "workspace:*",
     "prompt-engine": "workspace:*",
+    "qa-engine": "workspace:*",
     "shared-types": "workspace:*"
   },
   "devDependencies": {

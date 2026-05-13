@@ -1,10 +1,11 @@
-export type ProjectStatus = 'pending' | 'crawling' | 'analyzing' | 'generating_prompt' | 'completed' | 'failed';
+export type ProjectStatus = 'pending' | 'crawling' | 'crawled' | 'analyzing' | 'analysis_complete' | 'generating_prompt' | 'completed' | 'approved' | 'failed' | 'crawling_modernized' | 'qa_ready';
 export type StepStatus = 'idle' | 'running' | 'success' | 'failed' | 'retrying';
 
 export interface Project {
   id: string;
   url: string;
   status: ProjectStatus;
+  modernized_url?: string;
   created_at: string;
   updated_at: string;
   pages_count: number;

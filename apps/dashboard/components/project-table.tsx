@@ -1,8 +1,8 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { supabase } from '@/lib/supabase'
-import { Project } from '@/types'
+import { supabase } from '../lib/supabase'
+import { Project } from '../types'
 import {
   Table,
   TableBody,
@@ -10,9 +10,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+} from "./ui/table"
+import { Badge } from "./ui/badge"
+import { Button } from "./ui/button"
 import { formatDistanceToNow } from 'date-fns'
 import { ExternalLink, Search, Filter } from 'lucide-react'
 import Link from 'next/link'
@@ -57,10 +57,13 @@ export function ProjectTable() {
   const getStatusVariant = (status: string): "success" | "destructive" | "secondary" | "warning" | "default" | "outline" => {
     switch (status) {
       case 'completed': return 'success'
+      case 'approved': return 'success'
       case 'crawled': return 'default'
       case 'analysis_complete': return 'default'
+      case 'qa_ready': return 'default'
       case 'failed': return 'destructive'
       case 'pending': return 'secondary'
+      case 'crawling_modernized': return 'warning'
       default: return 'warning'
     }
   }
