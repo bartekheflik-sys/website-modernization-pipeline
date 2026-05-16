@@ -2,14 +2,15 @@
 
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { createProject } from '@/services/api'
-import { Plus, Loader2 } from 'lucide-react'
+import { Plus, Loader2, Link2, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { cn } from '@/lib/utils'
 
 export function CreateProjectForm() {
   const [url, setUrl] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isFocused, setIsFocused] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,34 +32,51 @@ export function CreateProjectForm() {
   }
 
   return (
-    <Card className="mb-8">
-      <CardHeader>
-        <CardTitle>Create New Project</CardTitle>
-        <CardDescription>
-          Enter a website URL to start the modernization pipeline.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="flex gap-4">
+    <div className="space-y-6">
+      <div className="flex flex-col gap-1">
+        <h2 className="text-sm font-bold uppercase tracking-widest text-primary/80">New Deployment</h2>
+        <p className="text-muted-foreground text-xs font-medium">Initialize a new modernization pipeline by providing a target URL.</p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="relative">
+        <div className={cn(
+          "relative flex items-center transition-all duration-300 rounded-2xl border bg-background/50 backdrop-blur-xl px-4 py-2 shadow-2xl",
+          isFocused ? "border-primary ring-4 ring-primary/10 -translate-y-1" : "border-white/10"
+        )}>
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary mr-3">
+            <Link2 className="h-5 w-5" />
+          </div>
           <input
             type="url"
-            placeholder="https://example.com"
+            placeholder="https://modernize-this-site.com"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            className="flex-1 bg-transparent border-none outline-none text-base font-medium placeholder:text-muted-foreground/50 h-12"
             required
             disabled={isLoading}
           />
-          <Button type="submit" disabled={isLoading}>
+          <Button 
+            type="submit" 
+            disabled={isLoading || !url} 
+            className="rounded-xl premium-gradient h-12 px-6 font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+          >
             {isLoading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               <Plus className="mr-2 h-4 w-4" />
             )}
-            Analyze Website
+            {isLoading ? 'Initializing...' : 'Analyze Website'}
           </Button>
-        </form>
-      </CardContent>
-    </Card>
+        </div>
+        
+        <div className="mt-4 flex items-center gap-4 text-[10px] font-bold text-muted-foreground/60 px-2 uppercase tracking-widest">
+          <span className="flex items-center gap-1.5"><div className="h-1 w-1 rounded-full bg-emerald-500" /> Auto-detection</span>
+          <span className="flex items-center gap-1.5"><div className="h-1 w-1 rounded-full bg-blue-500" /> Deep Extraction</span>
+          <span className="flex items-center gap-1.5"><div className="h-1 w-1 rounded-full bg-violet-500" /> AI Refinement</span>
+        </div>
+      </form>
+    </div>
   )
 }

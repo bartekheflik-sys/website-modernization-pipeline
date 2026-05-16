@@ -8,13 +8,4 @@ declare module "@radix-ui/react-slot" {
   export const Slot: React.ForwardRefExoticComponent<any>;
 }
 
-declare module "lucide-react" {
-  import * as React from "react";
-  export const Loader2: React.ForwardRefExoticComponent<any>;
-  export const Search: React.ForwardRefExoticComponent<any>;
-  export const Plus: React.ForwardRefExoticComponent<any>;
-  export const Globe: React.ForwardRefExoticComponent<any>;
-  export const Layout: React.ForwardRefExoticComponent<any>;
-  export const CheckCircle: React.ForwardRefExoticComponent<any>;
-  export const AlertCircle: React.ForwardRefExoticComponent<any>;
-}
+
