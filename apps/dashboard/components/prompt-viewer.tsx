@@ -43,6 +43,11 @@ export function PromptViewer({ prompt }: { prompt: GeneratedPrompt | null }) {
     URL.revokeObjectURL(url)
   }
 
+  const downloadZipPackage = () => {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    window.open(`${API_URL}/api/projects/${prompt.project_id}/export`, '_blank')
+  }
+
   return (
     <Card className="border-primary/20 bg-primary/5">
       <CardHeader className="border-b pb-6">
@@ -91,8 +96,11 @@ export function PromptViewer({ prompt }: { prompt: GeneratedPrompt | null }) {
               </Button>
             )}
             <Button variant="outline" size="sm" onClick={downloadPrompt}>
+              Download TXT
+            </Button>
+            <Button variant="outline" size="sm" onClick={downloadZipPackage} className="border-primary/50 text-primary hover:bg-primary/10">
               <ArrowUpRight className="h-4 w-4 mr-2" />
-              Export
+              Export Lovable ZIP
             </Button>
             <Button variant="default" size="sm" onClick={copyToClipboard} className="min-w-[100px]">
               {copied ? <CheckCircle className="h-4 w-4 mr-2" /> : <ExternalLink className="h-4 w-4 mr-2" />}

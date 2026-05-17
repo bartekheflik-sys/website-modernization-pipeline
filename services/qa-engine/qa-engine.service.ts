@@ -71,7 +71,7 @@ export class QAEngineService {
       model: "gemini-2.5-flash",
       generationConfig: {
         responseMimeType: "application/json",
-      }
+      } as any
     });
 
     const prompt = `
