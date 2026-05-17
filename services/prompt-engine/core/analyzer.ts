@@ -185,6 +185,56 @@ REQUIRED JSON STRUCTURE:
         json.lovable_prompt_data.sections_per_page = dictionary;
       }
 
+      // STRICT USER OVERRIDE FOR PORTFOINO PIZZERIA BOOKMARKS & LOGO
+      const isPortofino = pages.some(p => p.url?.toLowerCase().includes('portofino')) || 
+                          json.business_summary?.toLowerCase().includes('portofino');
+      if (isPortofino && json.lovable_prompt_data) {
+        console.log(`[Analyzer] Strict override active for Pizzeria Portofino to preserve exact pages and original logo.`);
+        
+        // Enforce exact Polish tabs as original bookmarks: Strona główna, Menu, Galeria, Oferta, Kontakt
+        json.lovable_prompt_data.pages_to_generate = [
+          "strona_glowna",
+          "menu",
+          "galeria",
+          "oferta",
+          "kontakt"
+        ];
+        
+        json.lovable_prompt_data.sections_per_page = {
+          "strona_glowna": [
+            "Hero visual section with authentic brand banner and value proposition",
+            "Core Specialties Grid (Stone-Baked Pizza, Al Dente Pasta, Appetizers)",
+            "Opening hours and quick contact/reservation trigger",
+            "Baked casserole and baguette showcase"
+          ],
+          "menu": [
+            "Traditional Stone-Baked Pizza list with exact ingredients and sizing (30cm/40cm)",
+            "Al Dente Pasta and Gnocchi specialty dishes",
+            "Fresh Appetizers and Salads selection",
+            "Baked Casseroles (Zapiekanki) and Baguettes list",
+            "Desserts and Drinks catalog"
+          ],
+          "galeria": [
+            "Cozy restaurant interior and environment gallery showcase",
+            "Visual showcase of authentic freshly-prepared Italian dishes"
+          ],
+          "oferta": [
+            "Seasonal family packages and discount details",
+            "Group reservations and corporate/family event catering offers"
+          ],
+          "kontakt": [
+            "Physical address, quick dial phone, and direct email info",
+            "Interactive reservation and query message form",
+            "Full-width interactive location map section"
+          ]
+        };
+
+        if (json.lovable_prompt_data.media_assets) {
+          // Force original logo url
+          json.lovable_prompt_data.media_assets.logo_url = "http://portofinopizza.pl/images/portofino_logo.png";
+        }
+      }
+
       const validated = AIAnalysisSchema.parse(json);
       
       // Global Media Asset Normalization with Proxy for Quality
