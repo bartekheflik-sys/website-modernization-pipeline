@@ -68,10 +68,7 @@ export class QAEngineService {
 
   private async generateAIReport(projectId: string, originalData: any[], matches: any[]) {
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash",
-      generationConfig: {
-        responseMimeType: "application/json",
-      } as any
+      model: "gemini-2.5-flash"
     });
 
     const prompt = `
