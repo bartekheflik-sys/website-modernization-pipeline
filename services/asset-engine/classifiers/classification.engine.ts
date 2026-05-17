@@ -24,7 +24,7 @@ export class ClassificationEngine {
     if (assets.length === 0) return [];
 
     const model = this.genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       generationConfig: {
         responseMimeType: "application/json",
         responseSchema: ({
@@ -87,15 +87,35 @@ export class ClassificationEngine {
       const text = response.text().trim();
       const raw = JSON.parse(text);
       return raw.classifications || [];
-    } catch (error) {
-      console.error(`[Classification] Batch Error:`, error);
-      return assets.map((_, i) => ({
-        id: i,
-        category: 'stock',
-        business_critical: false,
-        reasoning: 'Batch processing fallback'
-      }));
+    } catch (error: any) {
+      console.error(`[Classification] Batch Error with gemini-2.5-flash:`, error.message || error);
+      
+      // Self-healing fallback attempt using gemini-1.5-flash-latest
+      try {
+        console.log(`[Classification] Swapping to self-healing fallback model gemini-1.5-flash-latest...`);
+        const fallbackModel = this.genAI.getGenerativeModel({
+          model: 'gemini-1.5-flash-latest',
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: (model as any).generationConfig?.responseSchema
+          }
+        });
+        const result = await fallbackModel.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text().trim();
+        const raw = JSON.parse(text);
+        return raw.classifications || [];
+      } catch (fallbackError: any) {
+        console.error(`[Classification] Fallback model gemini-1.5-flash-latest also failed:`, fallbackError.message || fallbackError);
+        return assets.map((_, i) => ({
+          id: i,
+          category: 'stock',
+          business_critical: false,
+          reasoning: 'Batch processing fallback'
+        }));
+      }
     }
+
   }
 
   async processProjectAssets(projectId: string) {

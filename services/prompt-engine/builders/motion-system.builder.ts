@@ -33,34 +33,35 @@ PAGE TRANSITIONS: Subtle fade (300ms) between routes.
 LOADING STATES: Skeleton screens matching content layout.`,
 
     high: `
-ANIMATION PHILOSOPHY: Rich, high-motion, cinematic design that drives engagement and elevates brand premiumness. Use physics-based spring animations for a hyper-responsive feel.
-SMOOTH INERTIAL SCROLLING: Integrate smooth inertial scroll control (like Lenis Scroll or native JS smooth-damping) globally on the viewport.
-TRANSITIONS: Spring physics (stiffness: 100, damping: 15) for responsive elements.
-HERO ANIMATIONS:
-  - Headline: Animate characters/words in sequentially with spring transitions (stagger 60ms)
-  - Subtext: Smooth fade-in slide-up 150ms after headline completes
-  - CTA button: Spring scales from 0.5 to 1.0 with overshoot after subtext
-  - Background: Full-bleed background layer with smooth parallax scroll (scales slightly on scroll, translations linked to scroll progress via Framer Motion useScroll and useTransform)
-HOVER BEHAVIOR:
-  - Cards / Lists: Spring translate translateY(-10px) + premium soft colored glow drop shadow + border glow (250ms spring)
-  - Buttons: Shimmer gradient effect + scale(1.05) + hover elevation shadow
-  - Product/Menu thumbnails: Micro zoom on parent hover (scale 1.08, rounded container overflow hidden, 400ms transition)
-SCROLL & PAGE FLOW ANIMATIONS (NON-CASUAL):
-  - Horizontal Scroll Showcase: Translate vertical scroll progress into smooth horizontal translation on desktop (using Framer Motion useScroll, useTransform, and a sticky container) for key multi-item showcases (like Menu Categories or Project Galleries).
-  - Sticky Card Stacking: Stack cards cleanly on top of each other on vertical scroll using position: sticky and scroll-linked scale-down (scale: 1 - index * 0.03) to create a premium card deck stacking effect.
-  - Infinite Running Marquees: Integrate smooth, continuous infinite text marquees (taglines, ingredients, keywords) behind content layers sliding in opposite directions at low opacity to elevate ambient energy.
-  - Parallax Organic Layers: Background decorative shapes or industry icon SVGs float gently, translating at 0.15x scroll speed.
-  - Reveal Effects: Clip-path wipes and scroll-linked scale/opacity fades.
-BALANCE & CLARITY GUARDRAILS (CLEAN & SIMPLE):
-  - Do NOT animate body copy paragraphs or small text descriptions; keep them completely static to ensure high legibility and reading comfort.
-  - Keep the overall layout structural grid perfectly solid, minimalist, and spacious with generous breathing room (80px+ padding). Motion must occur within a highly-ordered, simple visual frame.
-MICROINTERACTIONS:
-  - Navigation: Header background starts transparent, transitions to highly-blurred backdrop glassmorphism with smooth color blend upon scrolling down.
-  - Active nav indicator slides dynamically beneath selected tab.
-  - Form field focus: Spring overshoot pop-in for placeholders and subtle glowing rings.
-PAGE TRANSITIONS: Crossfade + subtle entrance zoom scale (0.95→1) with spring (450ms).
-LOADING STATES: Shimmer skeleton cards, animated brand-colored pulse loaders.
-CURSOR: Custom interactive desktop cursor (fluid center dot + spring-lag ring that scales up on hover of clickable elements).`
+ANIMATION PHILOSOPHY (LAZAREV AGENCY / ELVA-LABS CINEMATIC MOTION):
+- Treat the entire interface as an active, living, high-end organic canvas. 
+- Implement a hyper-premium digital experience that combines smooth fluid spring animations, interactive camera guides, and organic liquid morphing elements.
+- Utilize GSAP or Framer Motion to drive physics-based spring curves (stiffness: 120, damping: 14) for incredibly satisfying, high-fidelity tactile feedback.
+
+1. THE LIVING ORGANIC PERSONA & LIQUID BLOB MORPHS:
+   - Ambient Background: Integrate beautifully blurred ambient sunset or purple-indigo radial glow blobs behind content layers.
+   - Organic Morphing Blobs: Create a floating decorative background "Persona" blob using an SVG or custom HTML div that constantly warps and morphs organically using a CSS @keyframes animation that cycles through border-radius values (e.g. keyframes 0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70% } 50% { border-radius: 50% 60% 30% 70% / 50% 60% 40% 60% } 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70% }).
+   - Glassmorphic Cards: All structural cards must be highly polished glass plates (backdrop-filter: blur(16px), border: 1px solid rgba(255,255,255,0.08), background: rgba(10,10,10,0.4)) with subtle chromatic aberration outlines to look premium and digital.
+
+2. CINEMATIC CAMERA RETICLES & ALIGNMENT FRAMES:
+   - Frame overlays: Place ultra-thin (0.5px), sharp camera crop lines, corner guides, or alignment target reticles in neon outlines overlaying primary photos (like product thumbnails or hero visuals) to match Elva's UI framing aesthetic.
+   - Interactive Parallax Guides: On mouse hover of cards, let these camera guidelines dynamically scale, pivot slightly, or rotate in a circular flow path (matching Elva's "Flow Arcs" and "Lighting Spot" alignment UI).
+
+3. LAZAREV FLOW ARCS SCROLL REVEALS:
+   - Instead of standard vertical fade-ins, elements must enter the viewport by sliding along curved orbital paths ("Flow Arcs"). 
+   - Implement this using Framer Motion combined translations: as the element becomes 80% visible, animate x: [80, 0], y: [40, 0], rotate: [12, 0], scale: [0.94, 1] with a smooth spring transition.
+   - Stagger the children sequentially with a 65ms spring offset.
+
+4. MAGNETIC CURSOR & SUNSET GLOW:
+   - Custom Desktop Cursor: Enforce a custom cursor consisting of a small center dot and a lag-ring. On hover of buttons or menu cards, the outer ring must warp, expand, and magnetic-snap to the button's bounds, while applying a glowing sunset light spot under the mouse.
+
+5. NON-CASUAL PAGE FLOW:
+   - Desktop Horizontal Scroll Showcase: Category showcases (e.g., project galleries or menus) must use position: sticky and horizontal transforms mapped to the vertical scroll progress to pull the user smoothly sideways before continuing down.
+   - Stacked Specialty Card Decks: Specialty items must stack cleanly on top of each other dynamically on scroll using position: sticky and scroll-linked scale-down to create a highly premium stacked visual deck.
+   - Infinite ambient marquee typography running at low opacity (0.04) in opposite directions behind sections.
+
+LEGIBILITY GUARDRAILS:
+   - Keep all copy, paragraphs, and description text 100% static to guarantee absolute readability and reader comfort. Only animate structural frames, borders, cards, and accent graphics.`
   };
 
   return `
