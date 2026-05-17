@@ -36,6 +36,50 @@ function getExtension(url: string, fileType?: string): string {
   return 'jpg'; // default fallback
 }
 
+// Helper to get descriptive, content-accurate filenames for assets
+function getDescriptiveFilename(asset: any, ext: string): string {
+  const urlLower = (asset.asset_url || '').toLowerCase();
+  const altLower = (asset.alt_text || '').toLowerCase();
+
+  // Logo detection
+  if (asset.asset_type === 'logo' || urlLower.includes('logo') || altLower.includes('logo')) {
+    return `logo.${ext}`;
+  }
+
+  // Food Products matching
+  if (urlLower.includes('pizza') || altLower.includes('pizza')) {
+    return `pizza.${ext}`;
+  }
+  if (urlLower.includes('pasta') || urlLower.includes('makaron') || altLower.includes('pasta') || altLower.includes('makaron')) {
+    return `pasta.${ext}`;
+  }
+  if (urlLower.includes('przystawki') || urlLower.includes('salat') || altLower.includes('przystawki') || altLower.includes('sałat')) {
+    return `przystawki_i_salatki.${ext}`;
+  }
+  if (urlLower.includes('bagiet') || altLower.includes('bagiet')) {
+    return `bagietki.${ext}`;
+  }
+  if (urlLower.includes('dania') || urlLower.includes('zapiekank') || altLower.includes('zapiekank')) {
+    return `zapiekanki.${ext}`;
+  }
+  if (urlLower.includes('deser') || urlLower.includes('napoj') || altLower.includes('deser') || altLower.includes('napój') || urlLower.includes('napoje')) {
+    return `desery_i_napoje.${ext}`;
+  }
+
+  // Interior/Atmosphere/Hero matching
+  if (urlLower.includes('banner') || urlLower.includes('homepage') || urlLower.includes('hero') || urlLower.includes('layout')) {
+    return `hero_visual.${ext}`;
+  }
+  if (urlLower.includes('restauracja') || urlLower.includes('interior') || altLower.includes('restauracja') || altLower.includes('interior')) {
+    return `interior_restaurant.${ext}`;
+  }
+
+  // Generic fallback with type and clean name
+  const rawName = asset.asset_url.split('/').pop() || `asset_${asset.id.slice(0, 5)}`;
+  const cleanName = sanitizeFilename(decodeURIComponent(rawName).replace(/\.[^/.]+$/, ''));
+  return `${asset.asset_type || 'asset'}_${cleanName}.${ext}`;
+}
+
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
@@ -122,28 +166,42 @@ ${page.markdown_content || '*(No text content detected on this page)*'}
     zip.file('prompt.txt', promptText);
     zip.file('lovable-drag-and-drop/prompt.txt', promptText);
 
-    // Select the best 5-6 assets to be copied directly into the lovable-drag-and-drop flat folder
-    // This allows selecting all files in lovable-drag-and-drop/ (3 text + 6 images = 9 files total)
-    // and dropping them in a single message, avoiding Lovable's 10-file upload limit!
+    // Select the best, content-distinct brand assets for the lovable-drag-and-drop flat folder
+    // We select exactly 6 unique descriptive files to stay strictly under the 10-file message upload limit
     const dragDropAssets: any[] = [];
     if (assets && assets.length > 0) {
-      // 1. Logo
-      const logoAsset = assets.find((a: any) => a.asset_type === 'logo');
-      if (logoAsset) dragDropAssets.push(logoAsset);
+      // Helper to add unique matching asset
+      const addFirstMatch = (filterFn: (a: any) => boolean) => {
+        const found = assets.find((a: any) => filterFn(a) && !dragDropAssets.some(d => d.id === a.id));
+        if (found) dragDropAssets.push(found);
+        return found;
+      };
 
-      // 2. Best Products (up to 3, sorted by quality_score if present, or just first 3)
-      const products = assets
-        .filter((a: any) => a.asset_type === 'product' && a.id !== logoAsset?.id)
-        .sort((a, b) => (b.quality_score || 0) - (a.quality_score || 0))
-        .slice(0, 3);
-      dragDropAssets.push(...products);
+      // 1. Primary Logo
+      addFirstMatch((a: any) => a.asset_type === 'logo' || a.asset_url.toLowerCase().includes('logo'));
 
-      // 3. Best Interior/Gallery (up to 2, sorted by quality_score)
-      const interior = assets
-        .filter((a: any) => (a.asset_type === 'interior' || a.asset_type === 'gallery') && a.id !== logoAsset?.id)
-        .sort((a, b) => (b.quality_score || 0) - (a.quality_score || 0))
-        .slice(0, 2);
-      dragDropAssets.push(...interior);
+      // 2. Pizza Product
+      addFirstMatch((a: any) => a.asset_type === 'product' && (a.asset_url.toLowerCase().includes('pizza') || a.alt_text?.toLowerCase().includes('pizza')));
+
+      // 3. Pasta/Makaron Product
+      addFirstMatch((a: any) => a.asset_type === 'product' && (a.asset_url.toLowerCase().includes('pasta') || a.asset_url.toLowerCase().includes('makaron') || a.alt_text?.toLowerCase().includes('makaron')));
+
+      // 4. Salad/Przystawki Product
+      addFirstMatch((a: any) => a.asset_type === 'product' && (a.asset_url.toLowerCase().includes('przystawki') || a.asset_url.toLowerCase().includes('salat') || a.alt_text?.toLowerCase().includes('sałat')));
+
+      // 5. Hero Visual
+      addFirstMatch((a: any) => a.asset_url.toLowerCase().includes('banner') || a.asset_url.toLowerCase().includes('homepage'));
+
+      // 6. Interior/Restaurant Atmosphere Photo
+      addFirstMatch((a: any) => a.asset_type === 'interior' || a.asset_type === 'gallery' || a.asset_url.toLowerCase().includes('restauracja'));
+
+      // Fill in generic backup products if any of the above were missing, up to max 6 images
+      if (dragDropAssets.length < 6) {
+        const fallbackProducts = assets
+          .filter((a: any) => a.asset_type === 'product' && !dragDropAssets.some(d => d.id === a.id))
+          .slice(0, 6 - dragDropAssets.length);
+        dragDropAssets.push(...fallbackProducts);
+      }
     }
 
     // Add README at root
@@ -165,8 +223,11 @@ This folder contains **exactly 9 files** (the optimal combination of brand conte
 2. \`crawled-content.md\` (Unified copy of ALL pages and subpages combined!)
 3. \`assets-manifest.md\` (Mapped original asset paths and tags)
 4. \`logo.[ext]\` (Your authentic brand logo)
-5. \`product_1.[ext]\`, \`product_2.[ext]\`, \`product_3.[ext]\` (Top 3 premium dish photos)
-6. \`interior_1.[ext]\`, \`interior_2.[ext]\` (Top 2 restaurant environment photos)
+5. \`pizza.[ext]\` (Authentic photo of Pizza)
+6. \`pasta.[ext]\` (Authentic photo of Pasta/Makarony)
+7. \`przystawki_i_salatki.[ext]\` (Authentic photo of Appetizers/Salads)
+8. \`hero_visual.[ext]\` (The main landing page Banner/Hero image)
+9. \`interior_restaurant.[ext]\` (Authentic photo of the restaurant's interior)
 
 ### 🚀 Step-by-Step Instructions:
 1. Extract this ZIP archive on your computer.
@@ -174,9 +235,9 @@ This folder contains **exactly 9 files** (the optimal combination of brand conte
 3. Select **all 9 files** and drag and drop them together into your Lovable chat interface!
 4. Send the message to Lovable. The files will upload instantly with no limits reached!
 5. In your chat prompt, write:
-   *"Use the exact assets from the uploaded zip in public/assets/ (referencing the original filenames like logo.png, products/7.jpg) and import the exact menu items and copywriting from the files inside content/."*
+   *"Use the exact assets from the uploaded files (referencing the exact content-descriptive filenames like logo.png, pizza.jpg, pasta.jpg, przystawki_i_salatki.jpg) and import the exact menu items and copywriting from the crawled-content.md."*
 
-This hybrid execution guarantees that the generated site will have **100% precise pricing, authentic Polish texts, and real visual assets** physically bundled in the codebase, bypassing any hotlink blocks or AI hallucinations!
+This content-descriptive naming guarantees that Lovable will map the **correct photo to the correct section** with surgical precision (showing a Pizza under Pizza, Pasta under Pasta, and Salad under Salads), bypassing any hotlink blocks or AI hallucinations!
 
 ---
 Generated by Antigravity Website Modernization Pipeline
@@ -202,16 +263,15 @@ Project ID: ${projectId}
         assetManifest += `## ${title}\n\n`;
         list.forEach((asset) => {
           const ext = getExtension(asset.asset_url, asset.file_type);
-          const rawName = asset.asset_url.split('/').pop() || `asset_${asset.id.slice(0, 8)}`;
-          const cleanName = sanitizeFilename(decodeURIComponent(rawName).replace(/\.[^/.]+$/, ''));
-          const localPath = `original-content/assets/${asset.asset_type || 'other'}/${cleanName}.${ext}`;
+          const localPath = `original-content/assets/${asset.asset_type || 'other'}/${sanitizeFilename(asset.asset_url.split('/').pop() || '')}`;
           
-          const isIncludedInDragDrop = dragDropAssets.some(d => d.id === asset.id);
+          const dragDropAsset = dragDropAssets.find(d => d.id === asset.id);
+          const dragDropName = dragDropAsset ? getDescriptiveFilename(asset, ext) : null;
           
           assetManifest += `- **Local Path**: \`${localPath}\`\n`;
           assetManifest += `  - Original URL: ${asset.asset_url}\n`;
+          assetManifest += `  - Content-Descriptive Name (for Drag-Drop): ${dragDropName ? `\`lovable-drag-and-drop/${dragDropName}\` ✅` : 'N/A'}\n`;
           assetManifest += `  - Type: ${asset.asset_type || 'Unknown'}\n`;
-          assetManifest += `  - Drag-and-Drop Essential: ${isIncludedInDragDrop ? '✅ Yes' : 'No'}\n`;
           if (asset.alt_text) assetManifest += `  - Alt Text: "${asset.alt_text}"\n`;
           if (asset.quality_score) assetManifest += `  - Quality Score: ${asset.quality_score}/10\n`;
           assetManifest += `\n`;
@@ -232,7 +292,6 @@ Project ID: ${projectId}
         try {
           const ext = getExtension(asset.asset_url, asset.file_type);
           const rawName = asset.asset_url.split('/').pop() || `asset_${asset.id.slice(0, 8)}`;
-          // Remove extension to sanitize name safely
           const cleanName = sanitizeFilename(decodeURIComponent(rawName).replace(/\.[^/.]+$/, ''));
           
           const localPath = `original-content/assets/${asset.asset_type || 'other'}/${cleanName}.${ext}`;
@@ -265,18 +324,7 @@ Project ID: ${projectId}
           // If this asset was chosen for the lovable-drag-and-drop flat folder, write it there too!
           const dragDropMatch = dragDropAssets.find(d => d.id === asset.id);
           if (dragDropMatch) {
-            // Label cleanly e.g., logo.png, product_1.jpg, interior_1.jpg
-            let flatName = '';
-            if (asset.asset_type === 'logo') {
-              flatName = `logo.${ext}`;
-            } else if (asset.asset_type === 'product') {
-              const prodIdx = dragDropAssets.filter(d => d.asset_type === 'product').findIndex(d => d.id === asset.id) + 1;
-              flatName = `product_${prodIdx}.${ext}`;
-            } else {
-              const intIdx = dragDropAssets.filter(d => d.asset_type !== 'logo' && d.asset_type !== 'product').findIndex(d => d.id === asset.id) + 1;
-              flatName = `interior_${intIdx}.${ext}`;
-            }
-            
+            const flatName = getDescriptiveFilename(asset, ext);
             zip.file(`lovable-drag-and-drop/${flatName}`, buffer);
           }
         } catch (err: any) {
