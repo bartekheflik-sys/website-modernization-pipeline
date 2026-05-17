@@ -26,7 +26,7 @@ function getExtension(url: string, fileType?: string): string {
     if (cleanType.includes('webp')) return 'webp';
     if (cleanType.includes('jpeg') || cleanType.includes('jpg')) return 'jpg';
   }
-  
+
   // Try extracting from URL
   const match = url.match(/\.([a-zA-Z0-9]+)(?:[\?#]|$)/);
   if (match) {
@@ -35,7 +35,7 @@ function getExtension(url: string, fileType?: string): string {
       return ext === 'jpeg' ? 'jpg' : ext;
     }
   }
-  
+
   return 'jpg'; // default fallback
 }
 
@@ -143,7 +143,7 @@ export async function GET(
         unifiedContent += `\n\n`;
 
         // Write separate pages in their folder for backup
-        const cleanTitle = page.title ? sanitizeFilename(page.title) : `page_${page.id.slice(0,8)}`;
+        const cleanTitle = page.title ? sanitizeFilename(page.title) : `page_${page.id.slice(0, 8)}`;
         const pageFileName = `original-content/pages/${cleanTitle}.md`;
         const pageSpecificContent = `
 # Original Crawled Content: ${page.title || 'Untitled Page'}
@@ -267,10 +267,10 @@ Project ID: ${projectId}
         list.forEach((asset) => {
           const ext = getExtension(asset.asset_url, asset.file_type);
           const localPath = `original-content/assets/${asset.asset_type || 'other'}/${sanitizeFilename(asset.asset_url.split('/').pop() || '')}`;
-          
+
           const dragDropAsset = dragDropAssets.find(d => d.id === asset.id);
           const dragDropName = dragDropAsset ? getDescriptiveFilename(asset, ext) : null;
-          
+
           assetManifest += `- **Local Path**: \`${localPath}\`\n`;
           assetManifest += `  - Original URL: ${asset.asset_url}\n`;
           assetManifest += `  - Content-Descriptive Name (for Drag-Drop): ${dragDropName ? `\`lovable-drag-and-drop/${dragDropName}\` ✅` : 'N/A'}\n`;
@@ -296,7 +296,7 @@ Project ID: ${projectId}
           const ext = getExtension(asset.asset_url, asset.file_type);
           const rawName = asset.asset_url.split('/').pop() || `asset_${asset.id.slice(0, 8)}`;
           const cleanName = sanitizeFilename(decodeURIComponent(rawName).replace(/\.[^/.]+$/, ''));
-          
+
           const localPath = `original-content/assets/${asset.asset_type || 'other'}/${cleanName}.${ext}`;
 
           // Perform request with realistic user agent to prevent hotlink protections/403s
@@ -320,23 +320,23 @@ Project ID: ${projectId}
 
           const arrayBuffer = await res.arrayBuffer();
           let buffer = Buffer.from(arrayBuffer);
-          
+
           // Check if this is a critical brand asset that needs upscaling (logo, products, interiors)
           const dragDropMatch = dragDropAssets.find(d => d.id === asset.id);
           const isCriticalType = ['logo', 'product', 'interior', 'gallery'].includes(asset.asset_type || '');
-          
+
           if ((dragDropMatch || isCriticalType) && ['jpg', 'jpeg', 'png'].includes(ext)) {
             // Write buffer to temporary file in current workspace directory
             const tempId = Math.random().toString(36).substring(7);
             const tempInputPath = path.join(process.cwd(), `temp_in_${tempId}.${ext}`);
             const tempOutputPath = path.join(process.cwd(), `temp_out_${tempId}.${ext}`);
-            
+
             try {
               fs.writeFileSync(tempInputPath, buffer);
-              
+
               // Run our local high-fidelity Lanczos + Unsharp Mask upscaling pipeline!
               execSync(`python3 sharpen.py "${tempInputPath}" "${tempOutputPath}" 3`);
-              
+
               if (fs.existsSync(tempOutputPath)) {
                 // Load the super-resolution enhanced buffer
                 buffer = fs.readFileSync(tempOutputPath);

@@ -118,7 +118,7 @@ export function buildAssetGuidance(analysis: AIAnalysisOutput, assets: any[] = [
     const urlLower = (asset.asset_url || '').toLowerCase();
     const altLower = (asset.alt_text || '').toLowerCase();
     const ext = asset.asset_url.split('.').pop()?.split('?')[0] || 'jpg';
-    
+
     if (urlLower.includes('logo') || altLower.includes('logo')) {
       return `logo.${ext}`;
     }
@@ -169,16 +169,16 @@ AUTHENTIC BUSINESS MEDIA (PRESERVE & ENHANCE):
 - These assets are REAL business assets. Preserve them at all costs.
 - Do NOT replace them with stock imagery or AI generations.
 ${criticalAssets.map(a => {
-  let instruction = 'Preserve authenticity.';
-  if (a.asset_type === 'product') instruction = 'Enhance quality, maintain dish authenticity. Render strictly as a small, crisp list/card thumbnail (max-width 120px) next to the text category.';
-  if (a.asset_type === 'team') instruction = 'Preserve real faces, sharpen and clean up artifacts.';
-  if (a.asset_type === 'interior') instruction = 'Show real atmosphere, optimize lighting/contrast.';
-  
-  const localName = getDescriptiveName(a);
-  return `- ${a.asset_type.toUpperCase()} (Locally uploaded as '${localName}'): ${a.asset_url}
+    let instruction = 'Preserve authenticity.';
+    if (a.asset_type === 'product') instruction = 'Enhance quality, maintain dish authenticity. Render strictly as a small, crisp list/card thumbnail (max-width 120px) next to the text category.';
+    if (a.asset_type === 'team') instruction = 'Preserve real faces, sharpen and clean up artifacts.';
+    if (a.asset_type === 'interior') instruction = 'Show real atmosphere, optimize lighting/contrast.';
+
+    const localName = getDescriptiveName(a);
+    return `- ${a.asset_type.toUpperCase()} (Locally uploaded as '${localName}'): ${a.asset_url}
   - Context: ${a.alt_text || 'Business asset'}
   - Strategy: ${instruction}`;
-}).join('\n')}
+  }).join('\n')}
 
 DECORATIVE & REPLACEMENT ASSETS (AI-ENHANCE OR REPLACE):
 - The following assets are peripheral. You may REPLACE them with high-fidelity stock or AI-generated versions that match the brand aesthetic:
