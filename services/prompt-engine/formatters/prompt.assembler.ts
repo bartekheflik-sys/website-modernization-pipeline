@@ -76,6 +76,11 @@ Follow the instructions below with surgical precision. Prioritize business authe
    - You MUST render exactly these names as the primary navigation bar links/routes:
      ${analysis.content_analysis.pages_detected.map(p => `* ${p}`).join('\n     ')}
 
+4. WCAG AA ACCESSIBILITY & HIGH CONTRAST TEXT (NO BLENDING):
+   - You MUST ensure absolute legibility of all written copy. Text color MUST NOT blend into the background color!
+   - For dark themes (like dark glassmorphism): Use pure white (#FFFFFF), slate-100, or high-brightness text for all headers and body copy. Never use mid-tone greys, dark slate, or low-contrast text on dark backgrounds.
+   - For buttons and callouts: Ensure text placed on top of colored gradients or bright background accents has a highly contrasting color (e.g., pure black or dark navy text on yellow/cyan/green buttons, and pure white text on dark blue/purple gradients).
+
 ==================================================
 LOVABLE WEBSITE GENERATION PROMPT
 ==================================================
