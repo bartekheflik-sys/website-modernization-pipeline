@@ -83,10 +83,14 @@ export class QAEngineService {
 
       TASK:
       Perform a BUSINESS-INTELLIGENCE QA audit.
-      1. Detect missing critical business pages or services.
-      2. Identify conversion gaps (missing CTAs, forms).
-      3. Evaluate trust elements (testimonials, FAQs, social proof).
-      4. Compare content hierarchy and messaging preservation.
+      1. Compare content hierarchy and messaging preservation.
+      2. Detect missing critical business pages or services ONLY IF they existed on the original site.
+      
+      STRICT ARCHITECTURE GUARDRAILS (CRITICAL):
+      - EXACT PAGE MATCHING: The modernized site MUST strictly mirror the exact pages from the original site. 
+      - BANNED EXPECTATIONS: Do NOT suggest or expect new pages that were not originally crawled (e.g., do NOT suggest adding a Blog, About Us, Online Ordering, or Dashboard).
+      - NO LOGIN/AUTH: Do NOT penalize the absence of a 'login' or 'admin' page. Do NOT expect functionality for a login page. We strictly avoid adding authentication.
+      - Do NOT mark pages as "missing" unless they existed on the original site but are missing from the modernized mapping.
 
       SCORING CRITERIA (0-100):
       - content_preservation: Did we keep the important business info?
