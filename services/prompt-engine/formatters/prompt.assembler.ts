@@ -48,16 +48,10 @@ Follow the instructions below with surgical precision. Prioritize business authe
 
 1. STRICT LOCAL IMAGE INTEGRATION (NO GENERATED PLACEHOLDERS):
    - The user has uploaded all authentic, super-resolution, beautifully-sharpened original business photos directly into your workspace files.
-   - You MUST NOT use generic stock images, AI generations, or Unsplash placeholder URLs (like unsplash.com/photos) for products, menus, or logos!
-   - You MUST reference them exactly as local files in the root folder. Match them dynamically based on the business type:
-     * Logo: Reference exactly as './logo.png' (or logo.jpg) - MUST be used in navbar and footer.
-     * Pizza / Primary Dishes: Reference exactly as './pizza.jpg'
-     * Pasta / Side Dishes: Reference exactly as './pasta.jpg'
-     * Baguettes / Casseroles: Reference exactly as './bagietki.jpg' or './zapiekanki.jpg'
-     * Appetizers / Salads: Reference exactly as './przystawki_i_salatki.jpg'
-     * Desserts / Beverages: Reference exactly as './desery_i_napoje.jpg'
-     * Interior Restaurant / Atmosphere: Reference exactly as './interior_restaurant.jpg'
-     * General Product / Tech / Dental / Services: Match dynamically with the filenames listed in Section I (e.g. './iphone_13.jpg', './dental_implant.jpg').
+   - You MUST NOT use generic stock images, AI generations, or Unsplash placeholder URLs for actual content, products, menus, or galleries!
+   - EXACT MANIFEST MATCHING: You MUST reference local files exactly by the filenames listed in the "Website Asset Manifest" provided at the end of this prompt. Do NOT guess filenames.
+   - SEMANTIC MAPPING: If a menu section is about "Pizza", find the filename in the manifest that matches Pizza (e.g. './Pizza.jpg'). If it's about "Zapiekanki", map it to the exact Zapiekanki photo (e.g. './Zapiekanki.jpg').
+   - NO LAZY GALLERY LOOPS: When rendering image galleries, grids, or product lists, you MUST NOT duplicate the same image multiple times (e.g., do not use \`Array(9).fill('./photo.jpg')\`). You MUST use distinct, unique photos from the Asset Manifest for every single gallery item and product card.
 
 2. CINEMATIC HIGH-MOTION FRAMEWORK (FRAMER MOTION):
    - You MUST build a highly-dynamic, premium web experience with fluid animations using Framer Motion. 
