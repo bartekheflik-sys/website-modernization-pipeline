@@ -90,11 +90,11 @@ export class ClassificationEngine {
     } catch (error: any) {
       console.error(`[Classification] Batch Error with gemini-2.5-flash:`, error.message || error);
       
-      // Self-healing fallback attempt using gemini-1.5-flash-latest
+      // Self-healing fallback attempt using gemini-1.5-flash
       try {
-        console.log(`[Classification] Swapping to self-healing fallback model gemini-1.5-flash-latest...`);
+        console.log(`[Classification] Swapping to self-healing fallback model gemini-1.5-flash...`);
         const fallbackModel = this.genAI.getGenerativeModel({
-          model: 'gemini-1.5-flash-latest',
+          model: 'gemini-1.5-flash',
           generationConfig: {
             responseMimeType: "application/json",
             responseSchema: (model as any).generationConfig?.responseSchema
@@ -106,7 +106,7 @@ export class ClassificationEngine {
         const raw = JSON.parse(text);
         return raw.classifications || [];
       } catch (fallbackError: any) {
-        console.error(`[Classification] Fallback model gemini-1.5-flash-latest also failed:`, fallbackError.message || fallbackError);
+        console.error(`[Classification] Fallback model gemini-1.5-flash also failed:`, fallbackError.message || fallbackError);
         return assets.map((_, i) => ({
           id: i,
           category: 'stock',
