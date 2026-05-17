@@ -70,6 +70,12 @@ Follow the instructions below with surgical precision. Prioritize business authe
      * Staggered Spring Entrances: Spring physics (stiffness 120, damping 14) for all menu items and buttons.
    - Legibility Lock: Keep all paragraphs and body copy text 100% static for perfect reading comfort.
 
+3. STRICT NAVIGATION & BOOKMARKS NAMES (NO CREATIVE RENAMING ALLOWED):
+   - You MUST use the exact detected original Polish names for the main navigation menu items/bookmarks verbatim!
+   - DO NOT translate, change, split, or rename these items under any circumstances (e.g. do NOT rename "Oferta" to "Specjalności" or "Dostawa", and do NOT rename "Kontakt" to "Napisz do nas").
+   - You MUST render exactly these names as the primary navigation bar links/routes:
+     ${analysis.content_analysis.pages_detected.map(p => `* ${p}`).join('\n     ')}
+
 ==================================================
 LOVABLE WEBSITE GENERATION PROMPT
 ==================================================
