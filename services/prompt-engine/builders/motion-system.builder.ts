@@ -33,28 +33,29 @@ PAGE TRANSITIONS: Subtle fade (300ms) between routes.
 LOADING STATES: Skeleton screens matching content layout.`,
 
     high: `
-ANIMATION PHILOSOPHY: Rich, cinematic motion that builds brand personality and delights users.
-TRANSITIONS: Spring physics (stiffness: 200, damping: 20) for primary elements. 300ms ease-out for secondary.
+ANIMATION PHILOSOPHY: Rich, high-motion, cinematic design that drives engagement and elevates brand premiumness. Use physics-based spring animations for a hyper-responsive feel.
+SMOOTH INERTIAL SCROLLING: Integrate smooth inertial scroll control (like Lenis Scroll or native JS smooth-damping) globally on the viewport.
+TRANSITIONS: Spring physics (stiffness: 100, damping: 15) for responsive elements.
 HERO ANIMATIONS:
-  - Headline: Words animate in sequentially with spring (stagger 80ms per word)
-  - Subtext: Fade in 200ms after headline completes
-  - CTA button: Scale up from 0.8 with spring after subtext
-  - Background: Subtle parallax scroll (moves at 0.3x scroll speed)
+  - Headline: Animate characters/words in sequentially with spring transitions (stagger 60ms)
+  - Subtext: Smooth fade-in slide-up 150ms after headline completes
+  - CTA button: Spring scales from 0.5 to 1.0 with overshoot after subtext
+  - Background: Full-bleed background layer with smooth parallax scroll (scales slightly on scroll, translations linked to scroll progress via Framer Motion useScroll and useTransform)
 HOVER BEHAVIOR:
-  - Cards: translateY(-8px) + glow shadow + border color shift (250ms spring)
-  - Buttons: shimmer effect + scale(1.04) + shadow lift
-  - Images: subtle zoom (scale 1.05, overflow hidden, 400ms ease-out)
+  - Cards / Lists: Spring translate translateY(-10px) + premium soft colored glow drop shadow + border glow (250ms spring)
+  - Buttons: Shimmer gradient effect + scale(1.05) + hover elevation shadow
+  - Product/Menu thumbnails: Micro zoom on parent hover (scale 1.08, rounded container overflow hidden, 400ms transition)
 SCROLL ANIMATIONS:
-  - Sections animate in with stagger: each child delays 80ms
-  - Numbers/stats: count-up animation when entering viewport
-  - Images: reveal with clip-path wipe (400ms ease-out)
+  - Staggered Entrances: Fade-in and slide-up child items sequentially as sections cross 80% viewport depth
+  - Parallax Organics: Foreground decorative elements float at a different speed than text
+  - Reveal Effects: Clip-path wipes and scroll-linked scale/opacity fades
 MICROINTERACTIONS:
-  - Form submission: button morphs to loading spinner then success checkmark
-  - Navigation: active link animates with indicator slide
-  - Tooltips: spring pop-in with slight overshoot
-PAGE TRANSITIONS: Crossfade + slight scale (0.98→1) on enter (400ms).
-LOADING STATES: Animated skeleton with shimmer effect.
-CURSOR: Custom cursor on desktop (dot + ring that follows with spring lag).`
+  - Navigation: Header background starts transparent, transitions to highly-blurred backdrop glassmorphism with smooth color blend upon scrolling down.
+  - Active nav indicator slides dynamically beneath selected tab.
+  - Form field focus: Spring overshoot pop-in for placeholders and subtle glowing rings.
+PAGE TRANSITIONS: Crossfade + subtle entrance zoom scale (0.95→1) with spring (450ms).
+LOADING STATES: Shimmer skeleton cards, animated brand-colored pulse loaders.
+CURSOR: Custom interactive desktop cursor (fluid center dot + spring-lag ring that scales up on hover of clickable elements).`
   };
 
   return `

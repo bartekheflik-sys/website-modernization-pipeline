@@ -26,9 +26,10 @@ ${design_direction.ui_direction}
 
 BRAND STYLE: ${design_direction.brand_style}
 
-STRICT MEDIA HANDLING (MANDATORY):
+STRICT MEDIA HANDLING & THUMBNAIL CONSTRAINTS (MANDATORY FOR ALL BUSINESS TYPES):
 - LOGO: ${primaryLogo ? `Use this EXACT URL for the logo: ${primaryLogo}. DO NOT use a placeholder or a generic icon. It is mandatory for the navigation and footer.` : 'Locate and use the original brand logo from the site data. If not found, use a high-end minimalist text-logo, but prioritize real assets.'}
-- REAL PHOTOGRAPHY: You MUST use the original photos provided in the section specs. Generic stock placeholders are forbidden if real assets (products, facility, team, work examples) are available.
+- THUMBNAIL PRESERVATION RULE FOR LEGACY ASSETS: All original media assets (like product photos, menu photos, case studies, or gallery pictures from the legacy crawled website) are highly compressed and low-resolution. To keep them crisp and professional, you MUST NOT stretch them, scale them up, or use them in large full-width elements, massive hero layouts, or full-width cards! Instead, keep them strictly as elegant, small thumbnails (max-width: 100px - 150px) such as rounded avatar circles, small square thumbnails on lists, or decorative floating badges next to detailed typography—exactly as they were in the original layout! This ensures they look extremely sharp and high-quality, rather than blurred or pixelated.
+- HIGH-RESOLUTION THEMATIC BACKGROUNDS: Since legacy assets must not be scaled up, you MUST generate beautiful, high-resolution, atmospheric background images or structural abstract visual backgrounds directly in the UI matching the industry type (e.g., abstract gradients for SaaS, premium medical graphics for a dentist, cozy rustic restaurant kitchen/oven atmosphere for a restaurant, corporate architecture for law firms). Apply a soft dark glassmorphic overlay ('backdrop-filter: blur(8px)') over these backgrounds to guarantee premium contrast and readable typography.
 
 MODERNITY LEVEL:
 Build a state-of-the-art modern website, NOT a template. The output must feel premium, high-end, and polished. Every section must have intentional spacing, clear visual hierarchy, and professional typography.

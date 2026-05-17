@@ -115,21 +115,24 @@ UNIVERSAL SECTION RULES:
 - Use original LOGO URL in Footer and Navigation.
 - Prioritize using ORIGINAL PRODUCT PHOTOS from the list above in the Services and Product sections.
 - If an image from the list matches a service/product by context, use it.
+- THUMBNAIL PRESERVATION RULE FOR ALL LEGACY ASSETS: All original media assets (like product photos, menu photos, case studies, or gallery pictures from the legacy crawled website) are highly compressed and low-resolution. To keep them crisp and professional, you MUST NOT stretch them, scale them up, or use them in large full-width elements, massive hero layouts, or full-width cards! Instead, keep them strictly as elegant, small thumbnails (max-width: 100px - 150px) such as rounded avatar circles, small square thumbnails on lists, or decorative floating badges next to detailed typography—exactly as they were in the original layout! This ensures they look extremely sharp and high-quality, rather than blurred or pixelated.
 
 STANDARD SECTION TEMPLATES:
 
 HERO (every page):
-- Split layout desktop | Stacked mobile
+- Full-bleed background layer or Split layout desktop | Stacked mobile
 - Content order: H1 → Subheadline → Primary CTA → Trust signal
 - Headline must be benefit-driven, NOT feature-driven
 - CTA: Large, high-contrast, action verb
-${lovable_prompt_data.media_assets?.brand_images?.[0] ? `- IMAGE: Use "${lovable_prompt_data.media_assets.brand_images[0]}" for the hero visual.` : ''}
+- ATMOSPHERIC HERO BACKGROUND: You MUST generate a stunning, high-resolution, atmospheric background image matching the business/industry context (e.g. cozy rustic kitchen with a stone fire glow for a pizzeria, sleek abstract gradients for SaaS, clean bright medical workspace for a clinic).
+- Apply a dark glassmorphic container overlay ('backdrop-filter: blur(12px)') over this generated background to ensure typography remains perfectly readable and high contrast.
+${lovable_prompt_data.media_assets?.brand_images?.[0] ? `- BRAND GRAPHIC: If available, you may feature "${lovable_prompt_data.media_assets.brand_images[0]}" in a small, elegant, decorative circular frame (max-width: 180px) next to the text, but DO NOT use it as the main background, as it will look pixelated.` : ''}
 
 SERVICES/PRODUCTS GRID:
 - 3-col desktop | 2-col tablet | 1-col mobile
 - Icon + Title + 2-line description + "Learn More" per card
 - Hover: translateY(-4px) + shadow
-- MANDATORY IMAGE: Each card MUST use one of the original photos from the "AVAILABLE MEDIA ASSETS" list above.
+- MANDATORY ORIGINAL THUMBNAIL: Each card MUST display its original matching photo as a small, elegant, crisp thumbnail (max-width: 120px) alongside the text layout. DO NOT blow these images up to span the full width of the card.
 - HARD FORBIDDEN: It is strictly forbidden to use generic stock photos or AI-generated placeholders if real industry-specific photos (products, facility, work examples) are listed above. If you use a placeholder when a real URL is available, the generation is considered a failure.
 
 PAGE-SPECIFIC SECTION SPECS:
