@@ -5,7 +5,7 @@ export async function runAIAnalysis(pages: any[]): Promise<AIAnalysisOutput> {
   const key = process.env.GEMINI_API_KEY || '';
   console.log(`[Analyzer] DEBUG: Using API Key starting with: ${key.substring(0, 8)}...`);
   const genAI = new GoogleGenerativeAI(key);
-  const model = genAI.getGenerativeModel({ 
+  const model = genAI.getGenerativeModel({
     model: 'gemini-2.5-flash',
     generationConfig: {
       responseMimeType: "application/json",
@@ -53,9 +53,9 @@ export async function runAIAnalysis(pages: any[]): Promise<AIAnalysisOutput> {
             type: SchemaType.OBJECT,
             properties: {
               pages_to_generate: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
-              sections_per_page: { 
-                type: SchemaType.ARRAY, 
-                items: { 
+              sections_per_page: {
+                type: SchemaType.ARRAY,
+                items: {
                   type: SchemaType.OBJECT,
                   properties: {
                     page_name: { type: SchemaType.STRING },
@@ -83,8 +83,8 @@ export async function runAIAnalysis(pages: any[]): Promise<AIAnalysisOutput> {
           }
         },
         required: [
-          "business_summary", "industry", "target_audience", "business_model", 
-          "core_services", "value_proposition", "content_analysis", 
+          "business_summary", "industry", "target_audience", "business_model",
+          "core_services", "value_proposition", "content_analysis",
           "design_direction", "ux_analysis", "lovable_prompt_data"
         ]
       } as any)
@@ -167,13 +167,13 @@ REQUIRED JSON STRUCTURE:
       const result = await model.generateContent(prompt);
       const response = await result.response;
       let text = response.text();
-      
+
       // JSON mode should return clean JSON, but we'll keep a fallback trimmer
       if (text.includes('```json')) text = text.split('```json')[1].split('```')[0].trim();
       else if (text.includes('```')) text = text.split('```')[1].split('```')[0].trim();
 
       const json = JSON.parse(text);
-      
+
       // NORMALIZE sections_per_page from Array of Objects to Dictionary
       if (Array.isArray(json.lovable_prompt_data?.sections_per_page)) {
         const dictionary: Record<string, string[]> = {};
@@ -186,11 +186,11 @@ REQUIRED JSON STRUCTURE:
       }
 
       // STRICT USER OVERRIDE FOR PORTFOINO PIZZERIA BOOKMARKS & LOGO
-      const isPortofino = pages.some(p => p.url?.toLowerCase().includes('portofino')) || 
-                          json.business_summary?.toLowerCase().includes('portofino');
+      const isPortofino = pages.some(p => p.url?.toLowerCase().includes('portofino')) ||
+        json.business_summary?.toLowerCase().includes('portofino');
       if (isPortofino && json.lovable_prompt_data) {
         console.log(`[Analyzer] Strict override active for Pizzeria Portofino to preserve exact pages and original logo.`);
-        
+
         // Enforce exact Polish tabs as original bookmarks: Strona główna, Menu, Galeria, Oferta, Kontakt
         json.lovable_prompt_data.pages_to_generate = [
           "strona_glowna",
@@ -199,7 +199,7 @@ REQUIRED JSON STRUCTURE:
           "oferta",
           "kontakt"
         ];
-        
+
         json.lovable_prompt_data.sections_per_page = {
           "strona_glowna": [
             "Hero visual section with authentic brand banner and value proposition",
@@ -236,12 +236,12 @@ REQUIRED JSON STRUCTURE:
       }
 
       const validated = AIAnalysisSchema.parse(json);
-      
+
       // Global Media Asset Normalization with Proxy for Quality
       if (validated.lovable_prompt_data.media_assets) {
         const ma = validated.lovable_prompt_data.media_assets;
-        const baseUrl = pages[0]?.url || ""; 
-        
+        const baseUrl = pages[0]?.url || "";
+
         const normalizeUrl = (url: string) => {
           if (!url) return "";
           let absoluteUrl = url;

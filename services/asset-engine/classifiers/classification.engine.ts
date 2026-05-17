@@ -1,9 +1,9 @@
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 import { supabase } from '../../crawler/storage/supabase';
 
-export type AssetCategory = 
-  | 'logo' | 'product' | 'menu' | 'hero' | 'team' 
-  | 'interior' | 'portfolio' | 'background' | 'icon' 
+export type AssetCategory =
+  | 'logo' | 'product' | 'menu' | 'hero' | 'team'
+  | 'interior' | 'portfolio' | 'background' | 'icon'
   | 'stock' | 'testimonial' | 'gallery';
 
 export interface ClassificationResult {
@@ -23,8 +23,8 @@ export class ClassificationEngine {
   async classifyAssetsBatch(assets: any[]): Promise<any[]> {
     if (assets.length === 0) return [];
 
-    const model = this.genAI.getGenerativeModel({ 
-      model: 'gemini-2.5-flash',
+    const model = this.genAI.getGenerativeModel({
+      model: 'gemini-1.5-flash',
       generationConfig: {
         responseMimeType: "application/json",
         responseSchema: ({
@@ -48,7 +48,7 @@ export class ClassificationEngine {
         } as any)
       }
     });
-    
+
     const assetList = assets.map((a, i) => ({
       id: i,
       url: a.asset_url,
@@ -107,17 +107,17 @@ export class ClassificationEngine {
     if (error || !assets || assets.length === 0) return;
 
     console.log(`[Classification] Batching ${assets.length} assets for Project: ${projectId}`);
-    
+
     // Process in batches of 20 to be safe with prompt size and quota
     const batchSize = 20;
     for (let i = 0; i < assets.length; i += batchSize) {
       const currentBatch = assets.slice(i, i + batchSize);
       const results = await this.classifyAssetsBatch(currentBatch);
-      
+
       for (let j = 0; j < currentBatch.length; j++) {
         const asset = currentBatch[j];
         const classification = results[j] || { category: 'stock', business_critical: false, reasoning: 'missing' };
-        
+
         await supabase
           .from('website_assets')
           .update({
@@ -130,7 +130,7 @@ export class ClassificationEngine {
           })
           .eq('id', asset.id);
       }
-      
+
       // Delay between batches to stay under 5 RPM
       if (i + batchSize < assets.length) {
         console.log(`[Classification] Waiting 15s to respect RPM quota...`);
