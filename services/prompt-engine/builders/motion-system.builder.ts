@@ -45,10 +45,15 @@ HOVER BEHAVIOR:
   - Cards / Lists: Spring translate translateY(-10px) + premium soft colored glow drop shadow + border glow (250ms spring)
   - Buttons: Shimmer gradient effect + scale(1.05) + hover elevation shadow
   - Product/Menu thumbnails: Micro zoom on parent hover (scale 1.08, rounded container overflow hidden, 400ms transition)
-SCROLL ANIMATIONS:
-  - Staggered Entrances: Fade-in and slide-up child items sequentially as sections cross 80% viewport depth
-  - Parallax Organics: Foreground decorative elements float at a different speed than text
-  - Reveal Effects: Clip-path wipes and scroll-linked scale/opacity fades
+SCROLL & PAGE FLOW ANIMATIONS (NON-CASUAL):
+  - Horizontal Scroll Showcase: Translate vertical scroll progress into smooth horizontal translation on desktop (using Framer Motion useScroll, useTransform, and a sticky container) for key multi-item showcases (like Menu Categories or Project Galleries).
+  - Sticky Card Stacking: Stack cards cleanly on top of each other on vertical scroll using position: sticky and scroll-linked scale-down (scale: 1 - index * 0.03) to create a premium card deck stacking effect.
+  - Infinite Running Marquees: Integrate smooth, continuous infinite text marquees (taglines, ingredients, keywords) behind content layers sliding in opposite directions at low opacity to elevate ambient energy.
+  - Parallax Organic Layers: Background decorative shapes or industry icon SVGs float gently, translating at 0.15x scroll speed.
+  - Reveal Effects: Clip-path wipes and scroll-linked scale/opacity fades.
+BALANCE & CLARITY GUARDRAILS (CLEAN & SIMPLE):
+  - Do NOT animate body copy paragraphs or small text descriptions; keep them completely static to ensure high legibility and reading comfort.
+  - Keep the overall layout structural grid perfectly solid, minimalist, and spacious with generous breathing room (80px+ padding). Motion must occur within a highly-ordered, simple visual frame.
 MICROINTERACTIONS:
   - Navigation: Header background starts transparent, transitions to highly-blurred backdrop glassmorphism with smooth color blend upon scrolling down.
   - Active nav indicator slides dynamically beneath selected tab.

@@ -113,6 +113,43 @@ export function buildAssetGuidance(analysis: AIAnalysisOutput, assets: any[] = [
   const criticalAssets = assets.filter(a => a.business_critical && a.asset_type !== 'logo');
   const decorativeAssets = assets.filter(a => !a.business_critical);
 
+  // Helper to match the local drag-and-drop descriptive name
+  const getDescriptiveName = (asset: any): string => {
+    const urlLower = (asset.asset_url || '').toLowerCase();
+    const altLower = (asset.alt_text || '').toLowerCase();
+    const ext = asset.asset_url.split('.').pop()?.split('?')[0] || 'jpg';
+    
+    if (urlLower.includes('logo') || altLower.includes('logo')) {
+      return `logo.${ext}`;
+    }
+    if (urlLower.includes('pizza') || altLower.includes('pizza')) {
+      return `pizza.${ext}`;
+    }
+    if (urlLower.includes('pasta') || urlLower.includes('makaron') || altLower.includes('pasta') || altLower.includes('makaron')) {
+      return `pasta.${ext}`;
+    }
+    if (urlLower.includes('przystawki') || urlLower.includes('salat') || altLower.includes('przystawki') || altLower.includes('sałat')) {
+      return `przystawki_i_salatki.${ext}`;
+    }
+    if (urlLower.includes('bagiet') || altLower.includes('bagiet')) {
+      return `bagietki.${ext}`;
+    }
+    if (urlLower.includes('dania') || urlLower.includes('zapiekank') || altLower.includes('zapiekank')) {
+      return `zapiekanki.${ext}`;
+    }
+    if (urlLower.includes('deser') || urlLower.includes('napoj') || altLower.includes('deser') || altLower.includes('napój') || urlLower.includes('napoje')) {
+      return `desery_i_napoje.${ext}`;
+    }
+    if (urlLower.includes('banner') || urlLower.includes('homepage') || urlLower.includes('hero') || urlLower.includes('layout')) {
+      return `hero_visual.${ext}`;
+    }
+    if (urlLower.includes('restauracja') || urlLower.includes('interior') || altLower.includes('restauracja') || altLower.includes('interior')) {
+      return `interior_restaurant.${ext}`;
+    }
+    const rawName = asset.asset_url.split('/').pop()?.split('?')[0] || 'asset';
+    return rawName.toLowerCase();
+  };
+
   // Determine primary logo
   const primaryLogo = logos.length > 0 ? logos[0].asset_url : (analysis.lovable_prompt_data.media_assets?.logo_url || '');
 
@@ -133,10 +170,12 @@ AUTHENTIC BUSINESS MEDIA (PRESERVE & ENHANCE):
 - Do NOT replace them with stock imagery or AI generations.
 ${criticalAssets.map(a => {
   let instruction = 'Preserve authenticity.';
-  if (a.asset_type === 'product') instruction = 'Enhance quality, maintain dish authenticity.';
+  if (a.asset_type === 'product') instruction = 'Enhance quality, maintain dish authenticity. Render strictly as a small, crisp list/card thumbnail (max-width 120px) next to the text category.';
   if (a.asset_type === 'team') instruction = 'Preserve real faces, sharpen and clean up artifacts.';
   if (a.asset_type === 'interior') instruction = 'Show real atmosphere, optimize lighting/contrast.';
-  return `- ${a.asset_type.toUpperCase()}: ${a.asset_url}
+  
+  const localName = getDescriptiveName(a);
+  return `- ${a.asset_type.toUpperCase()} (Locally uploaded as '${localName}'): ${a.asset_url}
   - Context: ${a.alt_text || 'Business asset'}
   - Strategy: ${instruction}`;
 }).join('\n')}
