@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 import { AIAnalysisSchema, AIAnalysisOutput } from '../schemas/analysis.schema';
 
 export async function runAIAnalysis(pages: any[]): Promise<AIAnalysisOutput> {
@@ -9,6 +9,85 @@ export async function runAIAnalysis(pages: any[]): Promise<AIAnalysisOutput> {
     model: 'gemini-2.5-flash',
     generationConfig: {
       responseMimeType: "application/json",
+      responseSchema: ({
+        type: SchemaType.OBJECT,
+        properties: {
+          business_summary: { type: SchemaType.STRING },
+          industry: { type: SchemaType.STRING },
+          target_audience: { type: SchemaType.STRING },
+          business_model: { type: SchemaType.STRING },
+          core_services: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+          value_proposition: { type: SchemaType.STRING },
+          content_analysis: {
+            type: SchemaType.OBJECT,
+            properties: {
+              pages_detected: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+              missing_pages: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+              weak_content_areas: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+              navigation_issues: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } }
+            },
+            required: ["pages_detected", "missing_pages", "weak_content_areas", "navigation_issues"]
+          },
+          design_direction: {
+            type: SchemaType.OBJECT,
+            properties: {
+              brand_style: { type: SchemaType.STRING },
+              ui_direction: { type: SchemaType.STRING },
+              color_direction: { type: SchemaType.STRING },
+              typography_direction: { type: SchemaType.STRING },
+              motion_level: { type: SchemaType.STRING }
+            },
+            required: ["brand_style", "ui_direction", "color_direction", "typography_direction", "motion_level"]
+          },
+          ux_analysis: {
+            type: SchemaType.OBJECT,
+            properties: {
+              conversion_score: { type: SchemaType.NUMBER },
+              cta_quality: { type: SchemaType.STRING },
+              missing_elements: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+              user_journey_issues: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } }
+            },
+            required: ["conversion_score", "cta_quality", "missing_elements", "user_journey_issues"]
+          },
+          lovable_prompt_data: {
+            type: SchemaType.OBJECT,
+            properties: {
+              pages_to_generate: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+              sections_per_page: { 
+                type: SchemaType.ARRAY, 
+                items: { 
+                  type: SchemaType.OBJECT,
+                  properties: {
+                    page_name: { type: SchemaType.STRING },
+                    sections: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } }
+                  },
+                  required: ["page_name", "sections"]
+                }
+              },
+              design_style: { type: SchemaType.STRING },
+              animation_style: { type: SchemaType.STRING },
+              conversion_goals: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+              must_include_elements: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+              media_assets: {
+                type: SchemaType.OBJECT,
+                properties: {
+                  logo_url: { type: SchemaType.STRING },
+                  product_images: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+                  team_images: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+                  brand_images: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+                  location_images: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } }
+                }
+              }
+            },
+            required: ["pages_to_generate", "sections_per_page", "design_style", "animation_style", "conversion_goals", "must_include_elements"]
+          }
+        },
+        required: [
+          "business_summary", "industry", "target_audience", "business_model", 
+          "core_services", "value_proposition", "content_analysis", 
+          "design_direction", "ux_analysis", "lovable_prompt_data"
+        ]
+      } as any)
     }
   });
 
@@ -61,7 +140,9 @@ REQUIRED JSON STRUCTURE:
   },
   "lovable_prompt_data": {
     "pages_to_generate": ["string"],
-    "sections_per_page": { "PageName": ["string"] },
+    "sections_per_page": [
+      { "page_name": "string", "sections": ["string"] }
+    ],
     "design_style": "string",
     "animation_style": "string",
     "conversion_goals": ["string"],
@@ -92,6 +173,18 @@ REQUIRED JSON STRUCTURE:
       else if (text.includes('```')) text = text.split('```')[1].split('```')[0].trim();
 
       const json = JSON.parse(text);
+      
+      // NORMALIZE sections_per_page from Array of Objects to Dictionary
+      if (Array.isArray(json.lovable_prompt_data?.sections_per_page)) {
+        const dictionary: Record<string, string[]> = {};
+        json.lovable_prompt_data.sections_per_page.forEach((item: any) => {
+          if (item.page_name && Array.isArray(item.sections)) {
+            dictionary[item.page_name] = item.sections;
+          }
+        });
+        json.lovable_prompt_data.sections_per_page = dictionary;
+      }
+
       const validated = AIAnalysisSchema.parse(json);
       
       // Global Media Asset Normalization with Proxy for Quality

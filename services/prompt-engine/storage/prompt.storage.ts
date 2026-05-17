@@ -26,6 +26,20 @@ export async function fetchAnalysisResult(projectId: string) {
   return data.analysis_json;
 }
 
+export async function fetchProjectAssets(projectId: string) {
+  const { data, error } = await supabase
+    .from('website_assets')
+    .select('*')
+    .eq('project_id', projectId);
+
+  if (error) {
+    console.error(`[Prompt Engine] Error fetching assets:`, error.message);
+    return [];
+  }
+
+  return data || [];
+}
+
 export async function saveGeneratedPrompt(projectId: string, output: GeneratedPromptOutput): Promise<void> {
   const { error } = await supabase
     .from('generated_prompts')

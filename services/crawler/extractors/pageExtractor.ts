@@ -4,6 +4,15 @@ import TurndownService from 'turndown';
 const turndownService = new TurndownService({ headingStyle: 'atx' });
 turndownService.remove(['script', 'style', 'noscript', 'iframe', 'nav', 'footer', 'header']);
 
+export interface ExtractedAsset {
+  url: string;
+  type: 'image' | 'background' | 'logo' | 'icon';
+  alt?: string;
+  dimensions?: { width: number; height: number };
+  dom_context?: string; // Parent element tag or classes
+  file_type?: string;
+}
+
 export interface ExtractedPageData {
   url: string;
   title: string;
@@ -11,7 +20,7 @@ export interface ExtractedPageData {
   headings: string[];
   content: string; // Markdown content
   links: string[];
-  images: Array<{ url: string; type: 'logo' | 'hero' | 'content' }>;
+  assets: ExtractedAsset[];
 }
 
 export function extractPageData(html: string, url: string): ExtractedPageData {
@@ -39,21 +48,55 @@ export function extractPageData(html: string, url: string): ExtractedPageData {
     }
   });
 
-  const images: ExtractedPageData['images'] = [];
+  const assets: ExtractedAsset[] = [];
+
+  // Extract standard images
   $('img[src]').each((_, el) => {
     let src = $(el).attr('src');
     if (src) {
-      try {
-        src = new URL(src, url).toString();
-      } catch {}
-      let type: 'logo' | 'hero' | 'content' = 'content';
-      const classOrId = ($(el).attr('class') || '') + ' ' + ($(el).attr('id') || '') + ' ' + src;
-      const lower = classOrId.toLowerCase();
+      try { src = new URL(src, url).toString(); } catch {}
       
-      if (lower.includes('logo')) type = 'logo';
-      else if (lower.includes('hero') || lower.includes('banner')) type = 'hero';
+      const alt = $(el).attr('alt') || '';
+      const parent = $(el).parent();
+      const dom_context = `${parent.prop('tagName')} ${parent.attr('class') || ''}`.trim();
       
-      images.push({ url: src, type });
+      assets.push({ 
+        url: src, 
+        type: 'image', 
+        alt, 
+        dom_context,
+        file_type: src.split('.').pop()?.split('?')[0].toLowerCase()
+      });
+    }
+  });
+
+  // Extract background images from style attributes
+  $('[style*="background-image"]').each((_, el) => {
+    const style = $(el).attr('style');
+    const match = style?.match(/url\(['"]?([^'"]+)['"]?\)/);
+    if (match && match[1]) {
+      let src = match[1];
+      try { src = new URL(src, url).toString(); } catch {}
+      
+      assets.push({ 
+        url: src, 
+        type: 'background',
+        dom_context: `${$(el).prop('tagName')} ${$(el).attr('class') || ''}`.trim(),
+        file_type: src.split('.').pop()?.split('?')[0].toLowerCase()
+      });
+    }
+  });
+
+  // Extract icons (favicon, touch icons)
+  $('link[rel*="icon"]').each((_, el) => {
+    let src = $(el).attr('href');
+    if (src) {
+      try { src = new URL(src, url).toString(); } catch {}
+      assets.push({ 
+        url: src, 
+        type: 'icon',
+        file_type: src.split('.').pop()?.split('?')[0].toLowerCase()
+      });
     }
   });
 
@@ -69,6 +112,6 @@ export function extractPageData(html: string, url: string): ExtractedPageData {
     headings,
     content,
     links: Array.from(new Set(links)), // Deduplicate
-    images
+    assets
   };
 }

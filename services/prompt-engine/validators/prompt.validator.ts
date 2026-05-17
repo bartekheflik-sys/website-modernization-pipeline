@@ -83,6 +83,38 @@ export function validateAnalysisInput(analysis: AIAnalysisOutput): void {
 }
 
 export function countSections(analysis: AIAnalysisOutput): number {
-  return Object.values(analysis.lovable_prompt_data.sections_per_page)
-    .reduce((total, sections) => total + sections.length, 0);
+  const detectedPages = analysis.content_analysis?.pages_detected || [];
+  const allPages = analysis.lovable_prompt_data.sections_per_page;
+  
+  // Apply same normalization as page-plan.builder to get accurate count
+  const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+  const aliasMap: Record<string, string[]> = {
+    home: ['strona', 'homepage', 'glowna', 'main'],
+    menu: ['menu'],
+    contact: ['kontakt', 'contact'],
+    gallery: ['galeria', 'gallery'],
+    catering: ['oferta', 'catering'],
+    order: ['order', 'zamow', 'delivery'],
+    about: ['about', 'historia', 'story'],
+  };
+  const detectedNorm = detectedPages.map(normalize);
+  const hasMatch = (pageName: string) => {
+    const tokens = normalize(pageName).split(' ').filter(t => t.length > 2);
+    for (const token of tokens) {
+      if (detectedNorm.some(d => d.includes(token))) return true;
+      for (const [key, aliases] of Object.entries(aliasMap)) {
+        if (token.includes(key) || key.includes(token)) {
+          if (aliases.some(alias => detectedNorm.some(d => d.includes(alias)))) return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  const filteredEntries = Object.entries(allPages).filter(([page]) =>
+    detectedPages.length === 0 || hasMatch(page)
+  );
+  const filteredPages = filteredEntries.length >= 2 ? filteredEntries : Object.entries(allPages);
+
+  return filteredPages.reduce((total, [, sections]) => total + sections.length, 0);
 }

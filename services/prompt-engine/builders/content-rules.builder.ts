@@ -43,12 +43,13 @@ H. CONTENT PRESERVATION & STRUCTURE RULES
 PAGES FOUND IN ORIGINAL SITE:
 ${content_analysis.pages_detected.map(p => `- ${p}`).join('\n')}
 
-MISSING PAGES TO ADD (ZERO TOLERANCE — Do NOT add unless original was empty):
-${content_analysis.missing_pages.map(p => `- ${p}`).join('\n')}
+STRICT NAVIGATION LOCK (HIGHEST PRIORITY):
+- The navigation structure MUST be an EXACT 1:1 match of the original site's detected pages above.
+- Do NOT add new pages like 'About Us', 'Online Order', or 'Reviews' unless they were detected in the original site.
+- You MAY add NEW SECTIONS within existing pages, but do NOT create new top-level routes.
 
-STRICT NAVIGATION LOCK:
-- The bookmark list MUST be an EXACT 1:1 match of the original site's detected pages.
-- Do NOT add 'About Us', 'Online Order', or 'Reviews' if they did not exist in the source links.
+DETECTED GAPS (add as SECTIONS within existing pages, NOT as new top-level pages):
+${content_analysis.missing_pages.map(p => `- Consider adding "${p}" as a section within the most relevant existing page`).join('\n')}
 
 WEAK CONTENT AREAS TO STRENGTHEN:
 ${content_analysis.weak_content_areas.map(w => `- ${w}`).join('\n')}
@@ -57,7 +58,7 @@ NAVIGATION ISSUES TO FIX:
 ${content_analysis.navigation_issues.map(n => `- ${n}`).join('\n')}
 
 CONTENT RULES:
-- NO NEW PAGES: Do NOT add pages like 'Online Order' or 'About Us' if they were not in the original site bookmarks.
+- NO NEW TOP-LEVEL PAGES: Strictly respect the original navigation structure.
 - LITERAL CONTENT PRESERVATION: Specific blocks of text such as welcome messages ("Szanowni Państwo...") and delivery fee information ("6zł na osiedlu...") MUST be preserved exactly as they appear in the source data. Do not summarize or "modernize" these specific pieces of information.
 - Rewrite other existing content to be benefit-driven, not feature-driven
 - Every page must have a clear purpose statement in the hero
@@ -107,32 +108,47 @@ IMAGE RESPONSIVENESS:
 `.trim();
 }
 
-export function buildAssetGuidance(analysis: AIAnalysisOutput): string {
+export function buildAssetGuidance(analysis: AIAnalysisOutput, assets: any[] = []): string {
+  const logos = assets.filter(a => a.asset_type === 'logo');
+  const criticalAssets = assets.filter(a => a.business_critical && a.asset_type !== 'logo');
+  const decorativeAssets = assets.filter(a => !a.business_critical);
+
+  // Determine primary logo
+  const primaryLogo = logos.length > 0 ? logos[0].asset_url : (analysis.lovable_prompt_data.media_assets?.logo_url || '');
+
   return `
 ==================================================
-I. IMAGE & ASSET GUIDANCE
+I. ASSET INTELLIGENCE & USAGE RULES
 ==================================================
 
 DESIGN STYLE: ${analysis.lovable_prompt_data.design_style}
 ANIMATION STYLE: ${analysis.lovable_prompt_data.animation_style}
 
-HERO IMAGE:
-- Use a high-quality, relevant stock photo matching the industry: ${analysis.industry}
-- Must convey professionalism, trust, and the value proposition
-- Apply a subtle overlay if text is placed over the image (40% dark or brand-color overlay)
+PRIMARY BRAND ASSETS (NON-NEGOTIABLE):
+- LOGO (VECTORIZE): ${primaryLogo ? primaryLogo : 'Generate high-end typographic logo.'}
+${logos.length > 0 ? `  - Instruction: This is the authentic brand logo. Use it in Nav and Footer. If it is a bitmap (PNG/JPG), vectorize it to SVG.` : ''}
 
-IMAGE LAYOUT PATTERNS:
-- Hero: Full-width background image OR split-layout (image right, text left)
-- Service cards: Square thumbnail (aspect-ratio 1:1) or icon-based (no image needed)
-- About section: Team photo or facility/product photo in rounded container
-- Testimonials: Small circular avatar (if available) or initial avatar
+AUTHENTIC BUSINESS MEDIA (PRESERVE & ENHANCE):
+- These assets are REAL business assets. Preserve them at all costs.
+- Do NOT replace them with stock imagery or AI generations.
+${criticalAssets.map(a => {
+  let instruction = 'Preserve authenticity.';
+  if (a.asset_type === 'product') instruction = 'Enhance quality, maintain dish authenticity.';
+  if (a.asset_type === 'team') instruction = 'Preserve real faces, sharpen and clean up artifacts.';
+  if (a.asset_type === 'interior') instruction = 'Show real atmosphere, optimize lighting/contrast.';
+  return `- ${a.asset_type.toUpperCase()}: ${a.asset_url}
+  - Context: ${a.alt_text || 'Business asset'}
+  - Strategy: ${instruction}`;
+}).join('\n')}
 
-VISUAL HIERARCHY FOR IMAGES:
-- Images support the content — they never compete with text
-- All images must have descriptive alt text (generate from context)
-- Use consistent aspect ratios within each section (e.g. all service card thumbnails are 16:9)
+DECORATIVE & REPLACEMENT ASSETS (AI-ENHANCE OR REPLACE):
+- The following assets are peripheral. You may REPLACE them with high-fidelity stock or AI-generated versions that match the brand aesthetic:
+${decorativeAssets.slice(0, 8).map(a => `- ${a.asset_type.toUpperCase()}: ${a.asset_url}`).join('\n')}
 
-MUST INCLUDE ELEMENTS:
-${analysis.lovable_prompt_data.must_include_elements.map(e => `- ${e}`).join('\n')}
+STRICT AUTHENTICITY GUARDRAIL:
+- NEVER generate fake people for "Team" sections.
+- NEVER generate fake food for "Menu" sections.
+- NEVER generate fake projects for "Portfolio" sections.
+- Use only the provided asset URLs for these categories.
 `.trim();
 }

@@ -1,4 +1,4 @@
-export type ProjectStatus = 'pending' | 'crawling' | 'crawled' | 'analyzing' | 'analysis_complete' | 'generating_prompt' | 'completed' | 'approved' | 'failed' | 'crawling_modernized' | 'qa_ready';
+export type ProjectStatus = 'pending' | 'crawling' | 'crawled' | 'analyzing_assets' | 'analyzing' | 'analysis_complete' | 'generating_prompt' | 'completed' | 'approved' | 'failed' | 'crawling_modernized' | 'qa_ready';
 export type StepStatus = 'idle' | 'running' | 'success' | 'failed' | 'retrying';
 
 export interface Project {

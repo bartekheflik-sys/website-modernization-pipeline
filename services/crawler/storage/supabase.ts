@@ -26,6 +26,35 @@ export async function saveCrawledPage(projectId: string, data: any, table: strin
   
   if (error) {
     console.error(`[Storage] Failed to save page ${data.url}:`, error.message);
+    return;
+  }
+
+  // Also save assets if any
+  if (data.assets && data.assets.length > 0) {
+    await saveAssets(projectId, data.url, data.assets);
+  }
+}
+
+async function saveAssets(projectId: string, pageUrl: string, assets: any[]) {
+  const formattedAssets = assets.map(asset => ({
+    project_id: projectId,
+    asset_url: asset.url,
+    source_page: pageUrl,
+    asset_type: asset.type,
+    dimensions: asset.dimensions || null,
+    file_type: asset.file_type,
+    alt_text: asset.alt,
+    metadata: {
+      dom_context: asset.dom_context
+    }
+  }));
+
+  const { error } = await supabase
+    .from('website_assets')
+    .upsert(formattedAssets, { onConflict: 'project_id,asset_url' });
+
+  if (error) {
+    console.error(`[Storage] Failed to save assets for ${pageUrl}:`, error.message);
   }
 }
 

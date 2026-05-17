@@ -89,6 +89,27 @@ export class WebCrawler {
       const html = await page.content();
       const extractedData = extractPageData(html, url);
       
+      // Enhance assets with dimensions using Playwright
+      const assetsWithDimensions = await page.evaluate((assets) => {
+        return assets.map(asset => {
+          if (asset.type === 'image') {
+            const img = document.querySelector(`img[src="${asset.url}"]`) as HTMLImageElement;
+            if (img) {
+              return {
+                ...asset,
+                dimensions: {
+                  width: img.naturalWidth || img.width,
+                  height: img.naturalHeight || img.height
+                }
+              };
+            }
+          }
+          return asset;
+        });
+      }, extractedData.assets);
+
+      extractedData.assets = assetsWithDimensions;
+      
       // Save directly to Supabase via our storage adapter
       await saveCrawledPage(this.options.projectId, extractedData, this.options.targetTable);
 

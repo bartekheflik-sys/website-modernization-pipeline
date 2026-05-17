@@ -13,6 +13,7 @@ import { ChevronLeft, Globe, ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { QAComparison } from '../../../components/qa-comparison'
+import { AssetGallery } from '../../../components/asset-gallery'
 
 export default function ProjectDetailPage() {
   const params = useParams()
@@ -88,14 +89,20 @@ export default function ProjectDetailPage() {
   }
 
   // Derive step statuses from project status and logs
-  const getStepStatus = (step: 'crawl' | 'analysis' | 'prompt'): StepStatus => {
+  const getStepStatus = (step: 'crawl' | 'asset_intel' | 'analysis' | 'prompt'): StepStatus => {
     if (!project) return 'idle'
     
     // Status mappings
     if (step === 'crawl') {
       if (project.status === 'crawling') return 'running'
-      if (['analyzing', 'generating_prompt', 'completed'].includes(project.status)) return 'success'
+      if (['analyzing_assets', 'analyzing', 'generating_prompt', 'completed'].includes(project.status)) return 'success'
       if (project.status === 'failed' && logs?.[0]?.step === 'crawl') return 'failed'
+    }
+
+    if (step === 'asset_intel') {
+      if (project.status === 'analyzing_assets') return 'running'
+      if (['analyzing', 'generating_prompt', 'completed'].includes(project.status)) return 'success'
+      if (project.status === 'failed' && logs?.[0]?.step === 'asset_intelligence') return 'failed'
     }
     
     if (step === 'analysis') {
@@ -114,9 +121,10 @@ export default function ProjectDetailPage() {
   }
 
   const pipelineSteps = [
-    { name: 'crawl', label: 'Website Crawling', status: getStepStatus('crawl') },
-    { name: 'analysis', label: 'AI Intelligence', status: getStepStatus('analysis') },
-    { name: 'prompt', label: 'Prompt Generation', status: getStepStatus('prompt') },
+    { name: 'crawl', label: 'Crawling', status: getStepStatus('crawl') },
+    { name: 'asset_intel', label: 'Asset Intelligence', status: getStepStatus('asset_intel') },
+    { name: 'analysis', label: 'AI Analysis', status: getStepStatus('analysis') },
+    { name: 'prompt', label: 'Prompt Gen', status: getStepStatus('prompt') },
   ]
 
   if (!project) return <div className="p-8">Loading project details...</div>
@@ -151,6 +159,7 @@ export default function ProjectDetailPage() {
         {/* Main Content (Left 2/3) */}
         <div className="lg:col-span-2 space-y-8">
           <PromptViewer prompt={prompt || null} />
+          <AssetGallery projectId={id} />
           <QAComparison projectId={id} modernizedUrl={project.modernized_url} />
           <AnalysisViewer analysis={analysis || null} />
         </div>

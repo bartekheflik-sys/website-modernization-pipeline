@@ -1,4 +1,4 @@
-import { fetchAnalysisResult, saveGeneratedPrompt } from './storage/prompt.storage';
+import { fetchAnalysisResult, saveGeneratedPrompt, fetchProjectAssets } from './storage/prompt.storage';
 import { generateLovablePrompt } from './formatters/prompt.assembler';
 import { GeneratedPromptOutput } from './validators/prompt.validator';
 
@@ -8,10 +8,11 @@ export async function generatePromptForProject(projectId: string): Promise<{ sta
 
     // STEP 1: Fetch validated Step 3 analysis from Supabase
     const analysisJson = await fetchAnalysisResult(projectId);
-    console.log(`[Prompt Engine] Step 3 analysis fetched successfully.`);
+    const assets = await fetchProjectAssets(projectId);
+    console.log(`[Prompt Engine] Step 3 analysis and ${assets.length} assets fetched successfully.`);
 
     // STEP 2: Generate the full deterministic Lovable prompt
-    const promptOutput = generateLovablePrompt(analysisJson);
+    const promptOutput = generateLovablePrompt(analysisJson, assets);
     console.log(`[Prompt Engine] Prompt generated: ${promptOutput.metadata.pages.length} pages, ${promptOutput.metadata.sections_count} sections.`);
 
     // STEP 3: Persist to Supabase generated_prompts table

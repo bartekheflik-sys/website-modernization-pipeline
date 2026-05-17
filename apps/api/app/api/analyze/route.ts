@@ -41,7 +41,7 @@ export async function POST(request: Request) {
 
     // Log Start
     await updateProjectStatus(projectId, 'analyzing');
-    await logPipelineStep(projectId, 'analysis', 'running', 'Starting AI website analysis via Gemini 2.0 Flash.');
+    await logPipelineStep(projectId, 'analysis', 'running', 'Starting AI website analysis via Gemini 2.5 Flash.');
 
     const result = await analyzeWebsiteData(projectId);
 

@@ -1,5 +1,6 @@
 import { WebCrawler } from './core/crawler';
 import { updateProjectStatus, logPipelineStep, logPipelineError } from './storage/supabase';
+import { assetEngine } from '../asset-engine/asset-engine.service';
 
 export async function crawlWebsite(projectId: string, url: string, isModernized: boolean = false) {
   try {
@@ -7,7 +8,7 @@ export async function crawlWebsite(projectId: string, url: string, isModernized:
     console.log(`[Crawler Service] Starting crawl for Project: ${projectId}, URL: ${url}, Target: ${targetTable}`);
     
     // Update DB status to visually show the user it is crawling
-    await updateProjectStatus(projectId, isModernized ? 'crawling_modernized' : 'crawling');
+    await updateProjectStatus(projectId, isModernized ? 'crawling' : 'crawling');
     await logPipelineStep(projectId, isModernized ? 'qa_crawl' : 'crawl', 'running', `Starting deep crawl of ${url}`);
     
     const crawler = new WebCrawler({
@@ -23,6 +24,13 @@ export async function crawlWebsite(projectId: string, url: string, isModernized:
     
     console.log(`[Crawler Service] Finished crawling ${pagesCrawled} pages for Project: ${projectId}`);
     await logPipelineStep(projectId, isModernized ? 'qa_crawl' : 'crawl', 'success', `Crawl complete. Successfully extracted ${pagesCrawled} pages.`);
+    
+    // START STAGE 6.5: Asset Intelligence
+    if (!isModernized) {
+      await updateProjectStatus(projectId, 'analyzing_assets');
+      await assetEngine.processProjectAssets(projectId);
+    }
+    
     await updateProjectStatus(projectId, isModernized ? 'qa_ready' : 'crawled'); // Ready for analysis
     
     return { status: isModernized ? 'qa_ready' : 'crawled', pagesCrawled };

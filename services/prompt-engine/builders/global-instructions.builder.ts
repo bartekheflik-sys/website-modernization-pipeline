@@ -1,8 +1,14 @@
 import { AIAnalysisOutput } from '../schemas/analysis.schema';
 
-export function buildGlobalInstructions(analysis: AIAnalysisOutput): string {
+export function buildGlobalInstructions(analysis: AIAnalysisOutput, assets: any[] = []): string {
   const { design_direction, ux_analysis } = analysis;
   const motionLevel = design_direction.motion_level;
+
+  // Extract primary logo from classified assets or AI-detected media
+  const logoAsset = assets.find((a: any) => a.category === 'logo' || a.category === 'Logo');
+  const primaryLogo = logoAsset?.url 
+    || analysis.lovable_prompt_data?.media_assets?.logo_url 
+    || null;
 
   const motionDescriptions = {
     low: 'Use minimal, functional animations only. Subtle fade-ins for content loading. No scroll-triggered effects. Clean, fast static transitions.',
@@ -21,7 +27,7 @@ ${design_direction.ui_direction}
 BRAND STYLE: ${design_direction.brand_style}
 
 STRICT MEDIA HANDLING (MANDATORY):
-- LOGO: ${analysis.lovable_prompt_data.media_assets?.logo_url ? `Use this EXACT URL for the logo: ${analysis.lovable_prompt_data.media_assets.logo_url}. DO NOT use a placeholder or a generic icon. It is mandatory for the navigation and footer.` : 'Locate and use the original brand logo from the site data. If not found, use a high-end minimalist text-logo, but prioritize real assets.'}
+- LOGO: ${primaryLogo ? `Use this EXACT URL for the logo: ${primaryLogo}. DO NOT use a placeholder or a generic icon. It is mandatory for the navigation and footer.` : 'Locate and use the original brand logo from the site data. If not found, use a high-end minimalist text-logo, but prioritize real assets.'}
 - REAL PHOTOGRAPHY: You MUST use the original photos provided in the section specs. Generic stock placeholders are forbidden if real assets (products, facility, team, work examples) are available.
 
 MODERNITY LEVEL:

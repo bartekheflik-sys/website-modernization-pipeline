@@ -1,9 +1,12 @@
 export type ProjectStatus = 
   | 'pending'
   | 'crawling'
+  | 'crawled'
+  | 'analyzing_assets'
   | 'analyzing'
-  | 'generating'
-  | 'qa'
+  | 'analysis_complete'
+  | 'generating_prompt'
+  | 'qa_ready'
   | 'completed'
   | 'failed';
 

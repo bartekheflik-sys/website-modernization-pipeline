@@ -26,3 +26,8 @@ Thumbs.db
 
 # Turborepo
 .turbo
+
+# IDE and Scratch directories
+.vscode/
+scratch/
+*.tsbuildinfo

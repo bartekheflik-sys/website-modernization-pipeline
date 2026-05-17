@@ -1,7 +1,34 @@
 import { AIAnalysisOutput } from '../schemas/analysis.schema';
 
+function normalize(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+}
+
+function hasDetectedMatch(pageName: string, detectedPages: string[]): boolean {
+  const pageTokens = normalize(pageName).split(' ').filter(t => t.length > 2);
+  const detectedNorm = detectedPages.map(d => normalize(d));
+  const aliasMap: Record<string, string[]> = {
+    home: ['strona', 'homepage', 'glowna', 'main'],
+    menu: ['menu'],
+    contact: ['kontakt', 'contact'],
+    gallery: ['galeria', 'gallery'],
+    catering: ['oferta', 'catering'],
+    order: ['order', 'zamow', 'delivery'],
+    about: ['about', 'historia', 'story'],
+  };
+  for (const token of pageTokens) {
+    if (detectedNorm.some(d => d.includes(token))) return true;
+    for (const [key, aliases] of Object.entries(aliasMap)) {
+      if (token.includes(key) || key.includes(token)) {
+        if (aliases.some(alias => detectedNorm.some(d => d.includes(alias)))) return true;
+      }
+    }
+  }
+  return false;
+}
+
 export function buildSectionSpecs(analysis: AIAnalysisOutput): string {
-  const { lovable_prompt_data, design_direction } = analysis;
+  const { lovable_prompt_data, design_direction, content_analysis } = analysis;
   const motionLevel = design_direction.motion_level;
 
   const animationByLevel = {
@@ -14,7 +41,10 @@ export function buildSectionSpecs(analysis: AIAnalysisOutput): string {
     ? 'Text animates in with spring; image fades in 200ms later.'
     : motionLevel === 'medium' ? 'Gentle fade-in over 600ms.' : 'Static.';
 
-  const pages = lovable_prompt_data.pages_to_generate;
+  const allPages = lovable_prompt_data.pages_to_generate;
+  const detectedPages = content_analysis.pages_detected || [];
+  const filteredPages = allPages.filter(page => hasDetectedMatch(page, detectedPages));
+  const pages = filteredPages.length >= 2 ? filteredPages : allPages;
   const sectionsMap = lovable_prompt_data.sections_per_page;
   const valuePropositionSnippet = analysis.value_proposition.slice(0, 80);
 
@@ -27,7 +57,20 @@ export function buildSectionSpecs(analysis: AIAnalysisOutput): string {
       const isHero = i === 0;
       const isLastSection = i === pageSections.length - 1;
       const titleLower = sectionTitle.toLowerCase();
-      const isContact = titleLower.includes('contact') || titleLower.includes('cta') || isLastSection;
+      const isContact = 
+        /\bcontact\b/.test(titleLower) || 
+        /\bform\b/.test(titleLower) || 
+        /\binquiry\b/.test(titleLower) || 
+        /\bcta\b/.test(titleLower) ||
+        /\bnewsletter\b/.test(titleLower) ||
+        /\bsign[\s-]up\b/.test(titleLower) ||
+        /\bbooking\b/.test(titleLower) ||
+        /\breservation\b/.test(titleLower) ||
+        /\border confirmation\b/.test(titleLower) ||
+        /\bpayment\b/.test(titleLower) ||
+        /\bcheckout\b/.test(titleLower) ||
+        /\bcart\b/.test(titleLower) ||
+        /\bquote\b/.test(titleLower);
       const isServices = titleLower.includes('service') || titleLower.includes('product') || titleLower.includes('feature') || titleLower.includes('solution');
 
       let layout = '- LAYOUT: Single column, full-width content block';
