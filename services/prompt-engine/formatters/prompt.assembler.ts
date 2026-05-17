@@ -77,8 +77,9 @@ Follow the instructions below with surgical precision. Prioritize business authe
    - For buttons and callouts: Ensure text placed on top of colored gradients or bright background accents has a highly contrasting color (e.g., pure black or dark navy text on yellow/cyan/green buttons, and pure white text on dark blue/purple gradients).
 
 5. ORIGINAL PHOTO RESOLUTION, RENDER SCALE & AI BACKGROUNDS:
-   - IMAGES AND PRODUCTS: You MUST preserve the original visual quality of all crawled images. NEVER stretch or scale up images beyond their native dimensions, as this causes pixelation. Do not use 'w-full' on images if it makes them larger than their original size. Use 'max-w-full' instead.
-   - SCALING: Render images either in their original size or smaller (proportional downscaling) using clean CSS properties like 'object-fit: cover' or 'object-fit: contain' to prevent any aspect-ratio stretching or distortion.
+   - IMAGES AND PRODUCTS: You MUST preserve the original visual quality of all crawled images. NEVER stretch or scale up images beyond their native dimensions, as this causes severe pixelation. 
+   - GRID & MASONRY CLAMPING: CSS Grids and Flexbox columns often forcefully stretch images to fill large desktop screens. You MUST prevent this! Apply strict max-width constraints (e.g. \`max-w-[400px]\`, \`w-fit\`, or \`mx-auto\`) to image containers. A low-resolution photo must NEVER be blown up to fill a massive grid cell!
+   - SCALING: Render images either in their original size or smaller using clean CSS properties like \`object-fit: contain\` or \`object-scale-down\` to prevent aspect-ratio distortion and upscaling.
    - AI BACKGROUNDS ALLOWANCE: You may use premium, high-resolution AI-generated or Unsplash images EXCLUSIVELY for full-width section backgrounds (like the Hero parallax background) to make the site look high quality.
    - AI CONTENT BAN: You MUST NOT use AI-generated or external placeholder images for specific content items like Products, Menu Items, or Galleries. Content items MUST use the authentic crawled photos.
 

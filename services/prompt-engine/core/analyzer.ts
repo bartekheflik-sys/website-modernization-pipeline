@@ -94,10 +94,10 @@ export async function runAIAnalysis(pages: any[]): Promise<AIAnalysisOutput> {
   const formattedPages = pages.map(p => ({
     url: p.url,
     title: p.title,
-    headings: (p.raw_json?.headings || []).slice(0, 5), // Reduced from 10
-    content: (p.content || "").slice(0, 1000), // Reduced from 1500
+    headings: (p.raw_json?.headings || []).slice(0, 30), 
+    content: (p.content || "").slice(0, 15000), // Massive context window allowed for full menus/catalogs
     images: (p.raw_json?.images || [])
-      .slice(0, 8) // Reduced from 15
+      .slice(0, 30)
       .map((img: any) => ({
         url: img.url || "",
         alt: img.alt || ""
