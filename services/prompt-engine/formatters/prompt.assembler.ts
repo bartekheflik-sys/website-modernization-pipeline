@@ -8,7 +8,7 @@ import { buildMotionSystem } from '../builders/motion-system.builder';
 import { buildBusinessContext, buildContentRules, buildResponsivenessRules, buildAssetGuidance } from '../builders/content-rules.builder';
 import { validateAnalysisInput, validatePromptOutput, countSections, GeneratedPromptOutput } from '../validators/prompt.validator';
 
-export function generateLovablePrompt(analysis: AIAnalysisOutput, assets: any[] = []): GeneratedPromptOutput {
+export function generateLovablePrompt(analysis: AIAnalysisOutput, assets: any[] = [], pages: any[] = []): GeneratedPromptOutput {
   // STEP 1: Validate that we have quality input data
   validateAnalysisInput(analysis);
 
@@ -29,7 +29,7 @@ export function generateLovablePrompt(analysis: AIAnalysisOutput, assets: any[] 
     buildConversionRules(analysis),
     buildMotionSystem(analysis),
     buildResponsivenessRules(),
-    buildContentRules(analysis),
+    buildContentRules(analysis, pages),
     buildAssetGuidance(analysis, assets),
   ];
 

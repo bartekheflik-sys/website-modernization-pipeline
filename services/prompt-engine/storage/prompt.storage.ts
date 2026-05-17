@@ -40,6 +40,20 @@ export async function fetchProjectAssets(projectId: string) {
   return data || [];
 }
 
+export async function fetchProjectPages(projectId: string) {
+  const { data, error } = await supabase
+    .from('crawled_pages')
+    .select('url, title, content, markdown_content')
+    .eq('project_id', projectId);
+
+  if (error) {
+    console.error(`[Prompt Engine] Error fetching crawled pages:`, error.message);
+    return [];
+  }
+
+  return data || [];
+}
+
 export async function saveGeneratedPrompt(projectId: string, output: GeneratedPromptOutput): Promise<void> {
   const { error } = await supabase
     .from('generated_prompts')

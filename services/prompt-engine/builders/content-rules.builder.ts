@@ -32,7 +32,7 @@ CONTENT PRESERVATION RULES:
 `.trim();
 }
 
-export function buildContentRules(analysis: AIAnalysisOutput): string {
+export function buildContentRules(analysis: AIAnalysisOutput, pages: any[] = []): string {
   const { content_analysis } = analysis;
 
   return `
@@ -66,7 +66,7 @@ CONTENT RULES:
 - All body text must be max 3 sentences per paragraph (scannable).
 
 VERBATIM ORIGINAL CONTENT TO PRESERVE (USE EXACTLY THIS TEXT FOR PAGES):
-${Object.entries(content_analysis.raw_content_map || {}).map(([url, content]) => `PAGE [${url}]:\n${content}`).join('\n\n')}
+${pages.map(p => `PAGE [${p.url || p.title}]:\n${(p.markdown_content || p.content || '').substring(0, 15000)}`).join('\n\n')}
 `.trim();
 }
 

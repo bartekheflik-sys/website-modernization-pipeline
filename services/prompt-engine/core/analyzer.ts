@@ -123,8 +123,7 @@ REQUIRED JSON STRUCTURE:
     "pages_detected": ["string"],
     "missing_pages": ["string"],
     "weak_content_areas": ["string"],
-    "navigation_issues": ["string"],
-    "raw_content_map": { "page_url_or_name": "EXACT verbatim text of the entire page content, especially the FULL menu items, prices, and descriptions. Do NOT summarize! Copy it exactly." }
+    "navigation_issues": ["string"]
   },
   "design_direction": {
     "brand_style": "string",
