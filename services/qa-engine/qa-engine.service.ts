@@ -76,7 +76,7 @@ export class QAEngineService {
       Compare the ORIGINAL website data with the Modernized Structure.
       
       ORIGINAL PAGES (Business Intent & Content Source):
-      ${JSON.stringify(originalData.map(p => ({ url: p.url, title: p.title, content: p.markdown_content?.substring(0, 500) })))}
+      ${JSON.stringify(originalData.map(p => ({ url: p.url, title: p.title, content: p.markdown_content?.substring(0, 15000) })))}
 
       MODERNIZED MAPPING (Generated Results):
       ${JSON.stringify(matches)}
