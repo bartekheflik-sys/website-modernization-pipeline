@@ -123,7 +123,8 @@ REQUIRED JSON STRUCTURE:
     "pages_detected": ["string"],
     "missing_pages": ["string"],
     "weak_content_areas": ["string"],
-    "navigation_issues": ["string"]
+    "navigation_issues": ["string"],
+    "raw_content_map": { "page_url_or_name": "EXACT verbatim text of the entire page content, especially the FULL menu items, prices, and descriptions. Do NOT summarize! Copy it exactly." }
   },
   "design_direction": {
     "brand_style": "string",
@@ -133,7 +134,7 @@ REQUIRED JSON STRUCTURE:
     "motion_level": "low | medium | high"
   },
   "ux_analysis": {
-    "conversion_score": 0-10,
+    "conversion_score": 0,
     "cta_quality": "string",
     "missing_elements": ["string"],
     "user_journey_issues": ["string"]

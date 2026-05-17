@@ -12,7 +12,8 @@ export const AIAnalysisSchema = z.object({
     pages_detected: z.array(z.string()),
     missing_pages: z.array(z.string()),
     weak_content_areas: z.array(z.string()),
-    navigation_issues: z.array(z.string())
+    navigation_issues: z.array(z.string()),
+    raw_content_map: z.record(z.string(), z.string()).optional()
   }),
 
   design_direction: z.object({

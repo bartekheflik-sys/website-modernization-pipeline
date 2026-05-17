@@ -59,12 +59,14 @@ ${content_analysis.navigation_issues.map(n => `- ${n}`).join('\n')}
 
 CONTENT RULES:
 - NO NEW TOP-LEVEL PAGES: Strictly respect the original navigation structure.
-- LITERAL CONTENT PRESERVATION: Specific blocks of text such as welcome messages ("Szanowni Państwo...") and delivery fee information ("6zł na osiedlu...") MUST be preserved exactly as they appear in the source data. Do not summarize or "modernize" these specific pieces of information.
-- Rewrite other existing content to be benefit-driven, not feature-driven
-- Every page must have a clear purpose statement in the hero
-- Replace all generic/weak headlines with action-oriented alternatives
-- Add subtext below every H2 section title (1–2 lines explaining the section purpose)
-- All body text must be max 3 sentences per paragraph (scannable)
+- LITERAL CONTENT PRESERVATION: Specific blocks of text such as welcome messages, contact info, and FULL MENUS MUST be preserved exactly as they appear in the source data. Do not summarize menus into categories! List every single item and price.
+- NO E-COMMERCE CTAS: Do NOT add generic CTAs like "Zamów", "Buy Now", or "Add to Cart" unless the original site explicitly had an online ordering system. Do NOT add shopping carts.
+- HIGH CONTRAST HEADINGS: You MUST use pure white (#FFFFFF) text for all headings and links that are placed on dark backgrounds or dark navbars. Do not use dark brown or black text on dark backgrounds!
+- Every page must have a clear purpose statement in the hero.
+- All body text must be max 3 sentences per paragraph (scannable).
+
+VERBATIM ORIGINAL CONTENT TO PRESERVE (USE EXACTLY THIS TEXT FOR PAGES):
+${Object.entries(content_analysis.raw_content_map || {}).map(([url, content]) => `PAGE [${url}]:\n${content}`).join('\n\n')}
 `.trim();
 }
 
