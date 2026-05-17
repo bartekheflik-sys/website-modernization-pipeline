@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import JSZip from 'jszip';
+import fs from 'fs';
+import path from 'path';
+import { execSync } from 'child_process';
 
 export const dynamic = 'force-dynamic';
 
@@ -316,13 +319,41 @@ Project ID: ${projectId}
           }
 
           const arrayBuffer = await res.arrayBuffer();
-          const buffer = Buffer.from(arrayBuffer);
+          let buffer = Buffer.from(arrayBuffer);
           
-          // Write to main structured catalog
+          // Check if this is a critical brand asset that needs upscaling (logo, products, interiors)
+          const dragDropMatch = dragDropAssets.find(d => d.id === asset.id);
+          const isCriticalType = ['logo', 'product', 'interior', 'gallery'].includes(asset.asset_type || '');
+          
+          if ((dragDropMatch || isCriticalType) && ['jpg', 'jpeg', 'png'].includes(ext)) {
+            // Write buffer to temporary file in current workspace directory
+            const tempId = Math.random().toString(36).substring(7);
+            const tempInputPath = path.join(process.cwd(), `temp_in_${tempId}.${ext}`);
+            const tempOutputPath = path.join(process.cwd(), `temp_out_${tempId}.${ext}`);
+            
+            try {
+              fs.writeFileSync(tempInputPath, buffer);
+              
+              // Run our local high-fidelity Lanczos + Unsharp Mask upscaling pipeline!
+              execSync(`python3 sharpen.py "${tempInputPath}" "${tempOutputPath}" 3`);
+              
+              if (fs.existsSync(tempOutputPath)) {
+                // Load the super-resolution enhanced buffer
+                buffer = fs.readFileSync(tempOutputPath);
+              }
+            } catch (upscaleErr: any) {
+              console.error(`[Exporter] Local upscaling failed for ${asset.asset_url}:`, upscaleErr.message);
+            } finally {
+              // Always clean up temp files immediately
+              if (fs.existsSync(tempInputPath)) fs.unlinkSync(tempInputPath);
+              if (fs.existsSync(tempOutputPath)) fs.unlinkSync(tempOutputPath);
+            }
+          }
+
+          // Write upscaled asset to main structured catalog
           zip.file(localPath, buffer);
 
-          // If this asset was chosen for the lovable-drag-and-drop flat folder, write it there too!
-          const dragDropMatch = dragDropAssets.find(d => d.id === asset.id);
+          // Write upscaled asset to drag-drop folder
           if (dragDropMatch) {
             const flatName = getDescriptiveFilename(asset, ext);
             zip.file(`lovable-drag-and-drop/${flatName}`, buffer);
