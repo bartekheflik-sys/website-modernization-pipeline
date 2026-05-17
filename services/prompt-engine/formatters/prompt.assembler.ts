@@ -70,9 +70,10 @@ Follow the instructions below with surgical precision. Prioritize business authe
      * Staggered Spring Entrances: Spring physics (stiffness 120, damping 14) for all menu items and buttons.
    - Legibility Lock: Keep all paragraphs and body copy text 100% static for perfect reading comfort.
 
-3. STRICT NAVIGATION & BOOKMARKS NAMES (NO CREATIVE RENAMING ALLOWED):
+3. STRICT NAVIGATION & BOOKMARKS NAMES (NO CREATIVE RENAMING OR EXTRA PAGES ALLOWED):
    - You MUST use the exact detected original Polish names for the main navigation menu items/bookmarks verbatim!
    - DO NOT translate, change, split, or rename these items under any circumstances (e.g. do NOT rename "Oferta" to "Specjalności" or "Dostawa", and do NOT rename "Kontakt" to "Napisz do nas").
+   - You MUST NOT add any extra pages, sections, login flows, or bookmarks (such as 'Login', 'Logowanie', 'Rejestracja', 'Admin', 'Dashboard', or 'Cart')! The site MUST strictly contain only the authentic crawled pages.
    - You MUST render exactly these names as the primary navigation bar links/routes:
      ${analysis.content_analysis.pages_detected.map(p => `* ${p}`).join('\n     ')}
 
@@ -80,6 +81,10 @@ Follow the instructions below with surgical precision. Prioritize business authe
    - You MUST ensure absolute legibility of all written copy. Text color MUST NOT blend into the background color!
    - For dark themes (like dark glassmorphism): Use pure white (#FFFFFF), slate-100, or high-brightness text for all headers and body copy. Never use mid-tone greys, dark slate, or low-contrast text on dark backgrounds.
    - For buttons and callouts: Ensure text placed on top of colored gradients or bright background accents has a highly contrasting color (e.g., pure black or dark navy text on yellow/cyan/green buttons, and pure white text on dark blue/purple gradients).
+
+5. ORIGINAL PHOTO RESOLUTION, RENDER SCALE & ASPECT RATIOS:
+   - You MUST preserve the original visual quality of all crawled images. NEVER stretch or scale up images beyond their original dimensions, as this causes blurriness.
+   - Render images either in their original size or smaller (proportional downscaling) using clean CSS properties like 'object-fit: cover' or 'object-fit: contain' to prevent any aspect-ratio stretching or distortion.
 
 ==================================================
 LOVABLE WEBSITE GENERATION PROMPT
