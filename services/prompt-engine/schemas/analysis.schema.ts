@@ -34,6 +34,7 @@ export const AIAnalysisSchema = z.object({
   lovable_prompt_data: z.object({
     pages_to_generate: z.array(z.string()),
     sections_per_page: z.record(z.string(), z.array(z.string())),
+    design_dna_id: z.string(),
     design_style: z.string(),
     animation_style: z.string(),
     conversion_goals: z.array(z.string()),

@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 import { AIAnalysisSchema, AIAnalysisOutput } from '../schemas/analysis.schema';
+import { DESIGN_DNA_LIBRARY } from '../builders/design-dna.library';
 
 export async function runAIAnalysis(pages: any[]): Promise<AIAnalysisOutput> {
   const key = process.env.GEMINI_API_KEY || '';
@@ -68,6 +69,7 @@ export async function runAIAnalysis(pages: any[]): Promise<AIAnalysisOutput> {
               animation_style: { type: SchemaType.STRING },
               conversion_goals: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
               must_include_elements: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+              design_dna_id: { type: SchemaType.STRING, description: "The ID of the best matching Design DNA profile for this business." },
               media_assets: {
                 type: SchemaType.OBJECT,
                 properties: {
@@ -79,7 +81,7 @@ export async function runAIAnalysis(pages: any[]): Promise<AIAnalysisOutput> {
                 }
               }
             },
-            required: ["pages_to_generate", "sections_per_page", "design_style", "animation_style", "conversion_goals", "must_include_elements"]
+            required: ["pages_to_generate", "sections_per_page", "design_dna_id", "design_style", "animation_style", "conversion_goals", "must_include_elements"]
           }
         },
         required: [
@@ -108,6 +110,11 @@ export async function runAIAnalysis(pages: any[]): Promise<AIAnalysisOutput> {
 
   const systemPrompt = `
 You are an expert Website Analyzer. Transform raw crawl data into a structured modernization plan.
+You MUST choose the best fitting Design DNA from the following library based on the business type:
+
+DESIGN DNA LIBRARY:
+${DESIGN_DNA_LIBRARY.map(dna => `- ID: ${dna.id} | Name: ${dna.name} | Suitable For: ${dna.suitable_for.join(', ')}`).join('\n')}
+
 Output MUST be a single valid JSON object following the schema below.
 Do not include any explanations or markdown blocks.
 

@@ -8,13 +8,21 @@ import { buildMotionSystem } from '../builders/motion-system.builder';
 import { buildBusinessContext, buildContentRules, buildResponsivenessRules, buildAssetGuidance } from '../builders/content-rules.builder';
 import { validateAnalysisInput, validatePromptOutput, countSections, GeneratedPromptOutput } from '../validators/prompt.validator';
 
+import { getDesignDNA } from '../builders/design-dna.library';
+
 export function generateLovablePrompt(analysis: AIAnalysisOutput, assets: any[] = [], pages: any[] = []): GeneratedPromptOutput {
   // STEP 1: Validate that we have quality input data
   validateAnalysisInput(analysis);
 
-  // STRICT GLOBAL ENFORCEMENT: Override motion level to HIGH to ensure dynamic layouts are generated
-  analysis.design_direction.motion_level = 'high';
-  if (analysis.lovable_prompt_data) {
+  // DYNAMIC DESIGN INJECTION: Map the chosen Design DNA to exact style guidelines
+  if (analysis.lovable_prompt_data && analysis.lovable_prompt_data.design_dna_id) {
+    const dna = getDesignDNA(analysis.lovable_prompt_data.design_dna_id);
+    analysis.design_direction.motion_level = 'high';
+    analysis.lovable_prompt_data.design_style = `${dna.name}: ${dna.design_style} Base Colors: ${dna.color_direction} Typography: ${dna.typography_direction}`;
+    analysis.lovable_prompt_data.animation_style = dna.animation_style;
+  } else if (analysis.lovable_prompt_data) {
+    // Fallback if AI fails to pick
+    analysis.design_direction.motion_level = 'high';
     analysis.lovable_prompt_data.design_style = 'Premium high-end modern cinematic showcase, dark glassmorphism, responsive visual breathing room';
     analysis.lovable_prompt_data.animation_style = 'Physics-based spring motion, scroll-linked parallax, horizontal showcases, sticky stacked decks, running marquees';
   }

@@ -35,9 +35,9 @@ export class WebCrawler {
     const normalizedStart = normalizeUrl(startUrl);
     this.visited.add(normalizedStart);
     this.queue.push({ url: normalizedStart, depth: 0 });
-    
+
     this.browser = await chromium.launch({ headless: true });
-    
+
     try {
       await this.processQueue();
     } finally {
@@ -58,7 +58,7 @@ export class WebCrawler {
 
       this.activeCrawls++;
       this.pagesCrawled++;
-      
+
       this.crawlPage(item.url, item.depth).finally(() => {
         this.activeCrawls--;
       });
@@ -75,11 +75,11 @@ export class WebCrawler {
     if (!this.browser) return;
 
     const page = await this.browser.newPage();
-    
+
     try {
       // Basic rate limiting/politeness delay between requests
       await new Promise(r => setTimeout(r, 500));
-      
+
       const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
       if (!response || !response.ok()) {
         console.warn(`[Crawler] Failed or Redirected ${url}: ${response?.status()}`);
@@ -88,7 +88,7 @@ export class WebCrawler {
 
       const html = await page.content();
       const extractedData = extractPageData(html, url);
-      
+
       // Enhance assets with dimensions using Playwright
       const assetsWithDimensions = await page.evaluate((assets) => {
         return assets.map(asset => {
@@ -109,7 +109,7 @@ export class WebCrawler {
       }, extractedData.assets);
 
       extractedData.assets = assetsWithDimensions;
-      
+
       // Save directly to Supabase via our storage adapter
       await saveCrawledPage(this.options.projectId, extractedData, this.options.targetTable);
 
@@ -120,7 +120,7 @@ export class WebCrawler {
           const normalized = normalizeUrl(link);
           const sameDomain = isSameDomain(this.options.startUrl, normalized);
           const alreadyVisited = this.visited.has(normalized);
-          
+
           if (sameDomain && !alreadyVisited) {
             this.visited.add(normalized); // Prevent duplicate queuing
             this.queue.push({ url: normalized, depth: depth + 1 });
