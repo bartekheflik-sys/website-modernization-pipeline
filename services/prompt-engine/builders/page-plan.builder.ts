@@ -5,7 +5,19 @@ import { AIAnalysisOutput } from '../schemas/analysis.schema';
  * Strips punctuation, lowercases, and collapses whitespace.
  */
 function normalize(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+  return s.toLowerCase()
+    .replace(/ł/g, 'l')
+    .replace(/ó/g, 'o')
+    .replace(/ś/g, 's')
+    .replace(/ć/g, 'c')
+    .replace(/ź/g, 'z')
+    .replace(/ż/g, 'z')
+    .replace(/ń/g, 'n')
+    .replace(/ę/g, 'e')
+    .replace(/ą/g, 'a')
+    .replace(/[^a-z0-9\s]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 /**

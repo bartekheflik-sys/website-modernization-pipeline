@@ -77,7 +77,7 @@ Follow the instructions below with surgical precision. Prioritize business authe
    - DO NOT translate, change, split, or rename these items under any circumstances.
    - BANNED ELEMENTS: You MUST NOT add any extra pages, sections, user authentication, login flows, or bookmarks! The site MUST strictly contain only the authentic crawled pages. Banned examples: 'Login', 'Logowanie', 'Rejestracja', 'Admin', 'Dashboard', 'Cart', 'Zamów'.
    - You MUST render exactly these names as the primary navigation bar links/routes:
-     ${analysis.content_analysis.pages_detected.map(p => `* ${p.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`).join('\n     ')}
+     ${analysis.content_analysis.pages_detected.filter(p => !p.includes(' - ')).map(p => `* ${p.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`).join('\n     ')}
 
 4. WCAG AA ACCESSIBILITY & HIGH CONTRAST TEXT (NO BLENDING):
    - You MUST ensure absolute legibility of all written copy. Text color MUST NOT blend into the background color!

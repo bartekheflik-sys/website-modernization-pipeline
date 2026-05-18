@@ -127,22 +127,22 @@ export function buildAssetGuidance(analysis: AIAnalysisOutput, assets: any[] = [
     if (urlLower.includes('logo') || altLower.includes('logo')) {
       return `logo.${ext}`;
     }
-    if (urlLower.includes('pizza') || altLower.includes('pizza')) {
+    if (urlLower.includes('/pizza') || altLower.includes('pizza') && !urlLower.includes('portofinopizza.pl')) {
       return `pizza.${ext}`;
     }
-    if (urlLower.includes('pasta') || urlLower.includes('makaron') || altLower.includes('pasta') || altLower.includes('makaron')) {
+    if (urlLower.includes('/pasta') || urlLower.includes('/makaron') || altLower.includes('pasta') || altLower.includes('makaron')) {
       return `pasta.${ext}`;
     }
-    if (urlLower.includes('przystawki') || urlLower.includes('salat') || altLower.includes('przystawki') || altLower.includes('sałat')) {
+    if (urlLower.includes('/przystawki') || urlLower.includes('/salat') || altLower.includes('przystawki') || altLower.includes('sałat')) {
       return `przystawki_i_salatki.${ext}`;
     }
-    if (urlLower.includes('bagiet') || altLower.includes('bagiet')) {
+    if (urlLower.includes('/bagiet') || altLower.includes('bagiet')) {
       return `bagietki.${ext}`;
     }
-    if (urlLower.includes('dania') || urlLower.includes('zapiekank') || altLower.includes('zapiekank')) {
+    if (urlLower.includes('/dania') || urlLower.includes('/zapiekank') || altLower.includes('zapiekank')) {
       return `zapiekanki.${ext}`;
     }
-    if (urlLower.includes('deser') || urlLower.includes('napoj') || altLower.includes('deser') || altLower.includes('napój') || urlLower.includes('napoje')) {
+    if (urlLower.includes('/deser') || urlLower.includes('/napoj') || altLower.includes('deser') || altLower.includes('napój') || urlLower.includes('napoje')) {
       return `desery_i_napoje.${ext}`;
     }
     if (urlLower.includes('banner') || urlLower.includes('homepage') || urlLower.includes('hero') || urlLower.includes('layout')) {
