@@ -80,7 +80,25 @@ export function buildSectionSpecs(analysis: AIAnalysisOutput): string {
       if (isHero) {
         layout = '- LAYOUT: Split (text left, visual right) on desktop | Stacked on mobile';
         animation = `- ANIMATION: ${heroAnimation}`;
-        extra = `- HEADLINE: Benefit-driven — derived from: "${valuePropositionSnippet}..."\n   - CTA BUTTON: High-contrast primary color, action verb (e.g. "Get a Quote", "Contact Us")`;
+        // Industry-aware CTA: never use generic "Get a Quote" for non-service businesses
+        const industry = (analysis.industry || '').toLowerCase();
+        let heroCta = 'Contact Us';
+        if (industry.includes('restaurant') || industry.includes('food') || industry.includes('pizza') || industry.includes('cafe') || industry.includes('bar')) {
+          heroCta = 'View Menu';
+        } else if (industry.includes('gym') || industry.includes('fitness') || industry.includes('sport') || industry.includes('wellness') || industry.includes('health')) {
+          heroCta = 'See Our Offer';
+        } else if (industry.includes('hotel') || industry.includes('hospitality') || industry.includes('accommodation')) {
+          heroCta = 'Book a Stay';
+        } else if (industry.includes('gallery') || industry.includes('art') || industry.includes('design') || industry.includes('creative') || industry.includes('agency')) {
+          heroCta = 'View Our Work';
+        } else if (industry.includes('real estate') || industry.includes('property')) {
+          heroCta = 'Browse Listings';
+        } else if (industry.includes('software') || industry.includes('saas') || industry.includes('tech') || industry.includes('app')) {
+          heroCta = 'Get Started';
+        } else if (industry.includes('law') || industry.includes('legal') || industry.includes('consult')) {
+          heroCta = 'Book a Consultation';
+        }
+        extra = `- HEADLINE: Benefit-driven — derived from: "${valuePropositionSnippet}..."\n   - CTA BUTTON: High-contrast primary color, action verb: "${heroCta}"`;
       } else if (isServices) {
         layout = '- LAYOUT: 3-column card grid (desktop) | 2-column (tablet) | 1-column (mobile)';
         extra = '- EACH CARD: Icon + Title + 2-sentence description + "Learn More" link\n   - HOVER: translateY(-4px) + shadow deepens (200ms ease-out)';

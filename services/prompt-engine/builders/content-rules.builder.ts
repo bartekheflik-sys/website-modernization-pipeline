@@ -66,7 +66,10 @@ CONTENT RULES:
 - All body text must be max 3 sentences per paragraph (scannable).
 
 VERBATIM ORIGINAL CONTENT TO PRESERVE (USE EXACTLY THIS TEXT FOR PAGES):
-${pages.map(p => `PAGE [${p.url || p.title}]:\n${(p.markdown_content || p.content || '').substring(0, 15000)}`).join('\n\n')}
+${pages.map(p => {
+  const text = (p.markdown_content || p.raw_json?.content || '').substring(0, 15000);
+  return `PAGE [${p.url || p.title}]:\n${text}`;
+}).join('\n\n')}
 `.trim();
 }
 

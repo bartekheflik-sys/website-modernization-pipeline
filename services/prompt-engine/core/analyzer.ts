@@ -150,6 +150,7 @@ REQUIRED JSON STRUCTURE:
     "sections_per_page": [
       { "page_name": "string", "sections": ["string"] }
     ],
+    "design_dna_id": "one of: dna_synthesis | dna_balmoral | dna_allia | dna_fauna | dna_lesse | dna_ozgur | dna_sondaven",
     "design_style": "string",
     "animation_style": "string",
     "conversion_goals": ["string"],
@@ -192,9 +193,9 @@ REQUIRED JSON STRUCTURE:
         json.lovable_prompt_data.sections_per_page = dictionary;
       }
 
-      // STRICT USER OVERRIDE FOR PORTFOINO PIZZERIA BOOKMARKS & LOGO
-      const isPortofino = pages.some(p => p.url?.toLowerCase().includes('portofino')) ||
-        json.business_summary?.toLowerCase().includes('portofino');
+      // STRICT SITE-SPECIFIC OVERRIDE — only fires for portofinopizza.pl
+      const isPortofino = pages.some(p => p.url?.toLowerCase().includes('portofinopizza.pl')) &&
+        (json.business_summary?.toLowerCase().includes('portofino') || json.industry?.toLowerCase().includes('pizza'));
       if (isPortofino && json.lovable_prompt_data) {
         console.log(`[Analyzer] Strict override active for Pizzeria Portofino to preserve exact pages and original logo.`);
 

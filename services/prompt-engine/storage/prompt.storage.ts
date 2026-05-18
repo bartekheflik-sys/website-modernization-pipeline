@@ -42,8 +42,8 @@ export async function fetchProjectAssets(projectId: string) {
 
 export async function fetchProjectPages(projectId: string) {
   const { data, error } = await supabase
-    .from('crawled_pages')
-    .select('url, title, content, markdown_content')
+    .from('pages')
+    .select('url, title, markdown_content, raw_json')
     .eq('project_id', projectId);
 
   if (error) {
