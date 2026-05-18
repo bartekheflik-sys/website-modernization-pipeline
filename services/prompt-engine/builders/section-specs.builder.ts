@@ -101,7 +101,7 @@ export function buildSectionSpecs(analysis: AIAnalysisOutput): string {
         extra = `- HEADLINE: Benefit-driven — derived from: "${valuePropositionSnippet}..."\n   - CTA BUTTON: High-contrast primary color, action verb: "${heroCta}"`;
       } else if (isServices) {
         layout = '- LAYOUT: 3-column card grid (desktop) | 2-column (tablet) | 1-column (mobile)';
-        extra = '- EACH CARD: Icon + Title + 2-sentence description + "Learn More" link\n   - HOVER: translateY(-4px) + shadow deepens (200ms ease-out)';
+        extra = '- EACH CARD: Icon + Title + 2-sentence description + "Learn More" link\n   - HOVER: -translate-y-1 shadow-[var(--shadow-card-hover)] transition-[var(--transition-smooth)]';
       } else if (isContact) {
         layout = '- LAYOUT: Centered column, max-width 600px, high-contrast background section';
         extra = '- FORM FIELDS: Name, Email, Message, Submit\n   - SUCCESS: Inline success message on submit (no redirect)';
@@ -142,14 +142,14 @@ HERO (every page):
 - Content order: H1 → Subheadline → Primary CTA → Trust signal
 - Headline must be benefit-driven, NOT feature-driven
 - CTA: Large, high-contrast, action verb
-- ATMOSPHERIC HERO BACKGROUND: You MUST generate a stunning, high-resolution, atmospheric background image matching the business/industry context (e.g. cozy rustic kitchen with a stone fire glow for a pizzeria, sleek abstract gradients for SaaS, clean bright medical workspace for a clinic).
-- Apply a dark glassmorphic container overlay ('backdrop-filter: blur(12px)') over this generated background to ensure typography remains perfectly readable and high contrast.
+- ATMOSPHERIC HERO BACKGROUND: Use the imagegen tool (flux.dev, 1920x1080) to generate a stunning atmospheric background image matching the business/industry context (e.g. cozy rustic kitchen with stone fire glow for a pizzeria, sleek dark abstract gradient for SaaS, warm bright medical workspace for a clinic). Save to src/assets/hero-bg.jpg and import as an ES6 module.
+- Overlay a glassmorphic container on top using the glass card variant tokens: bg-[hsl(var(--surface)/0.45)] backdrop-blur-[var(--glass-blur)] border-b border-[hsl(var(--glass-border))] — this ensures the foreground text remains text-foreground at full opacity and perfect contrast.
 ${lovable_prompt_data.media_assets?.brand_images?.[0] ? `- BRAND GRAPHIC: If available, you may feature "${lovable_prompt_data.media_assets.brand_images[0]}" in a small, elegant, decorative circular frame (max-width: 180px) next to the text, but DO NOT use it as the main background, as it will look pixelated.` : ''}
 
 SERVICES/PRODUCTS GRID:
 - 3-col desktop | 2-col tablet | 1-col mobile
 - Icon + Title + 2-line description + "Learn More" per card
-- Hover: translateY(-4px) + shadow
+- Hover: -translate-y-1 shadow-[var(--shadow-card-hover)] transition-[var(--transition-smooth)]
 - MANDATORY ORIGINAL THUMBNAIL: Each card MUST display its original matching photo as a small, elegant, crisp thumbnail (max-width: 120px) alongside the text layout. DO NOT blow these images up to span the full width of the card.
 - HARD FORBIDDEN: It is strictly forbidden to use generic stock photos or AI-generated placeholders if real industry-specific photos (products, facility, work examples) are listed above. If you use a placeholder when a real URL is available, the generation is considered a failure.
 

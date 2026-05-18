@@ -26,10 +26,47 @@ ${design_direction.ui_direction}
 
 BRAND STYLE: ${design_direction.brand_style}
 
+⚙️ LOVABLE DESIGN SYSTEM SETUP (DO THIS FIRST — BEFORE WRITING ANY COMPONENT):
+You MUST define the entire visual identity as CSS custom properties in index.css and register them in tailwind.config.ts BEFORE writing any component. Every color, gradient, shadow, and animation must be a named token. Never use hardcoded hex values, rgba() literals, or inline style overrides in components.
+
+STEP 1 — Define tokens in index.css:
+:root {
+  /* Brand colors — derived from: ${design_direction.color_direction} */
+  --primary: [choose HSL values for main brand action color];
+  --primary-glow: [lighter variant of primary, for glows];
+  --background: [deep dark or near-white HSL for page background];
+  --surface: [subtle contrast from background, for cards/panels];
+  --border: [low-opacity separator HSL];
+  --foreground: [main text — must be high contrast against --background];
+  --muted-foreground: [60-70% opacity text for captions/metadata];
+
+  /* Gradients */
+  --gradient-hero: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+  --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--surface)));
+
+  /* Glassmorphism */
+  --glass-bg: hsl(var(--surface) / 0.4);
+  --glass-border: hsl(var(--foreground) / 0.08);
+  --glass-blur: blur(16px);
+
+  /* Shadows */
+  --shadow-card: 0 2px 12px hsl(var(--primary) / 0.07);
+  --shadow-card-hover: 0 8px 32px hsl(var(--primary) / 0.18);
+  --shadow-nav: 0 1px 16px hsl(var(--background) / 0.12);
+
+  /* Transitions */
+  --transition-smooth: all 0.2s ease-out;
+  --transition-spring: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+STEP 2 — Register tokens in tailwind.config.ts so they are available as Tailwind classes (e.g. bg-background, text-foreground, border-border, shadow-card).
+
+STEP 3 — NEVER write ad-hoc Tailwind classes like text-white, bg-black, or text-gray-100 in component className props. Always use the semantic tokens: text-foreground, bg-background, bg-surface, border-border, etc.
+
 STRICT MEDIA HANDLING & THUMBNAIL CONSTRAINTS (MANDATORY FOR ALL BUSINESS TYPES):
 - LOGO: ${primaryLogo ? `Use this EXACT URL for the logo: ${primaryLogo}. DO NOT use a placeholder or a generic icon. It is mandatory for the navigation and footer.` : 'Locate and use the original brand logo from the site data. If not found, use a high-end minimalist text-logo, but prioritize real assets.'}
 - THUMBNAIL PRESERVATION RULE FOR LEGACY ASSETS: All original media assets (like product photos, menu photos, case studies, or gallery pictures from the legacy crawled website) are highly compressed and low-resolution. To keep them crisp and professional, you MUST NOT stretch them, scale them up, or use them in large full-width elements, massive hero layouts, or full-width cards! Instead, keep them strictly as elegant, small thumbnails (max-width: 100px - 150px) such as rounded avatar circles, small square thumbnails on lists, or decorative floating badges next to detailed typography—exactly as they were in the original layout! This ensures they look extremely sharp and high-quality, rather than blurred or pixelated.
-- HIGH-RESOLUTION THEMATIC BACKGROUNDS: Since legacy assets must not be scaled up, you MUST generate beautiful, high-resolution, atmospheric background images or structural abstract visual backgrounds directly in the UI matching the industry type (e.g., abstract gradients for SaaS, premium medical graphics for a dentist, cozy rustic restaurant kitchen/oven atmosphere for a restaurant, corporate architecture for law firms). Apply a soft dark glassmorphic overlay ('backdrop-filter: blur(8px)') over these backgrounds to guarantee premium contrast and readable typography.
+- HIGH-RESOLUTION THEMATIC BACKGROUNDS: Since legacy assets must not be scaled up, use the imagegen tool to generate a beautiful, atmospheric background image matching the business/industry type (e.g., cozy rustic restaurant kitchen with stone oven glow for a pizzeria, abstract dark gradients for SaaS, warm medical workspace for a clinic). Apply a glassmorphic overlay using the --glass-bg and --glass-blur tokens over the generated image to guarantee premium contrast.
 
 MODERNITY LEVEL:
 Build a state-of-the-art modern website, NOT a template. The output must feel premium, high-end, and polished. Every section must have intentional spacing, clear visual hierarchy, and professional typography.
@@ -38,7 +75,7 @@ MOTION SYSTEM (Level: ${motionLevel.toUpperCase()}):
 ${motionDescriptions[motionLevel]}
 
 SPACING PHILOSOPHY:
-Use generous padding and breathing room. Minimum 80px vertical padding per section on desktop. Content should never feel cramped or text-heavy without visual relief.
+Use generous padding and breathing room. Minimum 80px vertical padding per section on desktop. Content should never feel cramped or text-heavy without visual relief. Use the 8px base grid: spacers 8 / 16 / 24 / 32 / 48 / 64 / 80 / 96 / 128px.
 
 RESPONSIVENESS REQUIREMENTS:
 - Mobile-first development approach
@@ -51,8 +88,8 @@ RESPONSIVENESS REQUIREMENTS:
 
 ACCESSIBILITY:
 - Semantic HTML5 elements (nav, main, section, article, footer)
-- All images must have alt attributes
-- Color contrast must meet WCAG AA standards
+- All images must have descriptive alt attributes
+- Color contrast must meet WCAG AA standards — use foreground/background token pairings
 - Focus states must be visible for keyboard navigation
 
 QUALITY GATE:
