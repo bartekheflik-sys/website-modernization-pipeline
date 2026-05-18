@@ -73,11 +73,11 @@ Follow the instructions below with surgical precision. Prioritize business authe
    - Legibility Lock: Keep all paragraphs and body copy text 100% static for perfect reading comfort.
 
 3. STRICT NAVIGATION ARCHITECTURE & BANNED ELEMENTS:
-   - You MUST use the exact detected original Polish names for the main navigation menu items/bookmarks verbatim!
-   - DO NOT translate, change, split, or rename these items under any circumstances (e.g. do NOT rename "Oferta" to "Specjalności" or "Dostawa", and do NOT rename "Kontakt" to "Napisz do nas").
-   - BANNED ELEMENTS: You MUST NOT add any extra pages, sections, user authentication, login flows, or bookmarks! The site MUST strictly contain only the authentic crawled pages. Banned examples: 'Login', 'Logowanie', 'Rejestracja', 'Admin', 'Dashboard', 'Cart'.
+   - You MUST use the exact detected original page names for the main navigation menu items verbatim!
+   - DO NOT translate, change, split, or rename these items under any circumstances.
+   - BANNED ELEMENTS: You MUST NOT add any extra pages, sections, user authentication, login flows, or bookmarks! The site MUST strictly contain only the authentic crawled pages. Banned examples: 'Login', 'Logowanie', 'Rejestracja', 'Admin', 'Dashboard', 'Cart', 'Zamów'.
    - You MUST render exactly these names as the primary navigation bar links/routes:
-     ${analysis.content_analysis.pages_detected.map(p => `* ${p}`).join('\n     ')}
+     ${analysis.content_analysis.pages_detected.map(p => `* ${p.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`).join('\n     ')}
 
 4. WCAG AA ACCESSIBILITY & HIGH CONTRAST TEXT (NO BLENDING):
    - You MUST ensure absolute legibility of all written copy. Text color MUST NOT blend into the background color!

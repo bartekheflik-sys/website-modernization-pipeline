@@ -127,8 +127,8 @@ REQUIRED JSON STRUCTURE:
   "core_services": ["string"],
   "value_proposition": "string",
   "content_analysis": {
-    "pages_detected": ["string"],
-    "missing_pages": ["string"],
+    "pages_detected": ["EXACT URLs or page names found in the crawled data ONLY — do NOT invent pages"],
+    "missing_pages": ["ONLY list pages that EXISTED on the original site but seem functionally absent. Do NOT suggest Blog, About Us, Online Ordering, Login, Admin, or Reviews if they were NOT in the crawled data"],
     "weak_content_areas": ["string"],
     "navigation_issues": ["string"]
   },

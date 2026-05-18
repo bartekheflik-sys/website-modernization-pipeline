@@ -26,9 +26,9 @@ ${ux_analysis.user_journey_issues.map(i => `- ${i}`).join('\n')}
 
 CTA STRATEGY:
 - The PRIMARY CTA must appear within the first viewport (above the fold) on every page
-- Use action-oriented verbs: "Get Started", "Request Quote", "Contact Us Now", "Learn More"
-- Never use passive CTA text like "Click Here" or "Submit"
-- Include a SECONDARY CTA (lower commitment) near the primary: e.g. "See Our Work" next to "Get a Quote"
+- Use action-oriented verbs that are APPROPRIATE FOR THE INDUSTRY — e.g. "View Menu" for restaurants, "Book a Stay" for hotels, "Get Started" for SaaS. Never use passive text like "Click Here" or "Submit"
+- Never add online ordering, cart, or payment CTAs unless the original site had these features
+- Include a SECONDARY CTA (lower commitment) near the primary: e.g. "See Our Work" next to "Contact Us"
 
 TRUST-BUILDING PLACEMENT:
 - Place trust signals (client count, years of experience, certifications) directly below the hero

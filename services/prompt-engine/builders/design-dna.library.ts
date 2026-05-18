@@ -55,7 +55,7 @@ export const DESIGN_DNA_LIBRARY: DesignDNA[] = [
     name: "Lesse Studio (Avant-Garde Minimalist)",
     description: "Extremely reductive, confident, and editorial. Communicates luxury, exclusivity, and pure aesthetic focus.",
     suitable_for: ["Creative Agencies", "High-end Fashion", "Art Galleries", "Luxury Goods", "Architecture"],
-    design_style: "Radical minimalism. Massive whitespace, asymmetrical layouts, tiny navigational elements. Let's the work speak entirely for itself.",
+    design_style: "Radical minimalism. Massive whitespace, asymmetrical layouts, tiny navigational elements. Lets the work speak entirely for itself.",
     animation_style: "Cinematic and deliberate. Slow cross-fades, horizontal scrolling sections, image distortion on scroll, custom cursor blending.",
     color_direction: "Strictly neutral. Pure blacks, pure whites, warm greys, and unbleached linen tones.",
     typography_direction: "High-contrast serif typography (like Playfair Display or Ogg) used at massive scale, paired with microscopic sans-serif utility text."
@@ -83,5 +83,9 @@ export const DESIGN_DNA_LIBRARY: DesignDNA[] = [
 ];
 
 export function getDesignDNA(id: string): DesignDNA {
-  return DESIGN_DNA_LIBRARY.find(dna => dna.id === id) || DESIGN_DNA_LIBRARY[0];
+  const found = DESIGN_DNA_LIBRARY.find(dna => dna.id === id);
+  if (found) return found;
+  // Safe fallback: clean minimalist — works for most business types without being wrong
+  console.warn(`[Design DNA] Unknown DNA id "${id}" — falling back to dna_lesse (clean minimalism)`);
+  return DESIGN_DNA_LIBRARY.find(dna => dna.id === 'dna_lesse') || DESIGN_DNA_LIBRARY[0];
 }
