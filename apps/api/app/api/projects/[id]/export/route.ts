@@ -131,7 +131,7 @@ export async function GET(
 
     // Build unified crawled-content.md (combining all pages' text)
     let unifiedContent = `# Original Crawled Website Copy - ${project.url}\n\n`;
-    unifiedContent += `This unified document contains the complete text copy extracted from all crawled pages of Pizzeria Portofino. Use this exact text to populate sections, items, and pricing.\n\n`;
+    unifiedContent += `This unified document contains the complete text copy extracted from all crawled pages of ${project.name || project.url}. Use this exact text to populate sections, items, and pricing.\n\n`;
 
     if (pages && pages.length > 0) {
       pages.forEach((page: any) => {
@@ -211,7 +211,7 @@ ${page.markdown_content || '*(No text content detected on this page)*'}
     const readmeContent = `
 # Lovable.ai Website Modernization Package
 
-This package contains the exact raw content, verified authentic assets, and a state-of-the-art visual prompt generated for **Pizzeria Portofino** (Original URL: ${project.url}).
+This package contains the exact raw content, verified authentic assets, and a state-of-the-art visual prompt generated for **${project.name || project.url}** (Original URL: ${project.url}).
 
 ---
 
