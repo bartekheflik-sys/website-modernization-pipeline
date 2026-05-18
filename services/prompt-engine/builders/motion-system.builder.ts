@@ -55,8 +55,13 @@ ANIMATION PHILOSOPHY (LAZAREV AGENCY / ELVA-LABS CINEMATIC MOTION):
    - Custom desktop cursor: small center dot + lag-ring using Framer Motion useMotionValue for x/y tracking.
    - On button hover: outer ring expands and snaps with a glowing hsl(var(--primary-glow)) light spot under mouse.
 
-5. NON-CASUAL PAGE FLOW:
-   - Desktop Horizontal Scroll Showcase: Category showcases (menus, galleries) use sticky + horizontal transforms mapped to vertical scroll progress (useScroll + useTransform from Framer Motion).
+5. 3D ANIMATIONS & SPATIAL DEPTH (INDUSTRY: ${analysis.industry}):
+   - Use Framer Motion's 3D transform properties (rotateX, rotateY, perspective) to create subtle 3D card tilt effects (e.g. whileHover={{ rotateX: 5, rotateY: -5, scale: 1.05 }} style={{ perspective: 1000 }}).
+   - Bring life to the website by placing abstract 3D geometric shapes or industry-specific floating assets behind the content layers, slowly rotating via useAnimationFrame.
+
+6. ADVANCED PARALLAX & SCROLL EFFECTS:
+   - Hero Parallax: Map scroll Y-position to the hero background image scale and Y-translate using useScroll and useTransform so the background moves slower than the foreground.
+   - Desktop Horizontal Scroll Showcase: Category showcases (menus, galleries) use sticky + horizontal transforms mapped to vertical scroll progress.
    - Stacked Specialty Card Decks: Specialty items use sticky + scroll-linked scale-down via useTransform for premium stacked visual deck.
    - Infinite ambient marquee typography at opacity-[0.04] running in opposite directions behind sections.
 
