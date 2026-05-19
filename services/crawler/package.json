@@ -5,6 +5,7 @@
   "main": "index.ts",
   "dependencies": {
     "@supabase/supabase-js": "^2.39.8",
+    "asset-queue": "workspace:^",
     "cheerio": "^1.2.0",
     "dotenv": "^17.4.2",
     "playwright": "^1.60.0",

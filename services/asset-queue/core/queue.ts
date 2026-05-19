@@ -1,12 +1,12 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 
 export type JobStatus = 'pending' | 'processing' | 'completed' | 'failed';
-export type JobType = 'image_enhancement' | 'logo_vectorization' | 'background_removal' | 'webp_conversion' | 'ai_background_generation';
+export type JobType = 'classify_assets' | 'image_enhancement' | 'logo_vectorization' | 'background_removal' | 'webp_conversion' | 'ai_background_generation';
 
 export interface AssetJobPayload {
-  assetId: string;
+  assetId?: string;
   projectId: string;
-  url: string;
+  url?: string;
   metadata?: Record<string, any>;
 }
 

@@ -38,6 +38,12 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.39.8
         version: 2.105.4
+      asset-engine:
+        specifier: workspace:^
+        version: link:../../services/asset-engine
+      asset-queue:
+        specifier: workspace:^
+        version: link:../../services/asset-queue
       crawler-service:
         specifier: workspace:*
         version: link:../../services/crawler
@@ -256,6 +262,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.39.8
         version: 2.105.4
+      asset-queue:
+        specifier: workspace:^
+        version: link:../asset-queue
       cheerio:
         specifier: ^1.2.0
         version: 1.2.0
