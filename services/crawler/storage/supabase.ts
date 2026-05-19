@@ -59,9 +59,23 @@ async function saveAssets(projectId: string, pageUrl: string, assets: any[]) {
 }
 
 export async function updateProjectStatus(projectId: string, status: string) {
+  const stateMap: Record<string, string> = {
+    'analyzing_assets': 'assets_processing',
+    'assets_processing': 'assets_processing',
+    'crawling': 'crawling',
+    'crawled': 'assets_processing',
+    'qa_ready': 'qa_completed',
+    'failed': 'failed'
+  };
+  const pipelineState = stateMap[status] || status;
+
   await supabase
     .from('projects')
-    .update({ status, updated_at: new Date().toISOString() })
+    .update({ 
+      status, 
+      pipeline_state: pipelineState,
+      updated_at: new Date().toISOString() 
+    })
     .eq('id', projectId);
 }
 

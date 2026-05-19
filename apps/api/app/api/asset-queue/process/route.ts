@@ -42,7 +42,11 @@ export async function POST(request: Request) {
         // Let's update the project's status to "crawled" so the frontend dashboard knows it is ready to analyze.
         await supabaseAdmin
           .from('projects')
-          .update({ status: 'crawled', updated_at: new Date().toISOString() })
+          .update({ 
+            status: 'crawled', 
+            pipeline_state: 'assets_processing',
+            updated_at: new Date().toISOString() 
+          })
           .eq('id', projectId);
 
         await logPipelineStep(
