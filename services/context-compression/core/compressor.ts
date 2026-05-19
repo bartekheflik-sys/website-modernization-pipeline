@@ -17,7 +17,7 @@ export class ContextCompressor {
     return Math.ceil(text.length / 4);
   }
 
-  static compress(pages: { url: string; title: string; content: string }[], options: CompressOptions = {}): CompressedContext {
+  static compress(pages: { url: string; title: string; content?: string; markdown_content?: string }[], options: CompressOptions = {}): CompressedContext {
     const maxTokens = options.maxTokens || 800000; // Gemini 1.5 Flash default limit buffer
     let totalOriginalTokens = 0;
     let totalCompressedTokens = 0;
@@ -42,11 +42,12 @@ export class ContextCompressor {
     });
 
     for (const page of sortedPages) {
-      const originalTokens = this.estimateTokens(page.content);
+      const rawContent = (page as any).content || (page as any).markdown_content || '';
+      const originalTokens = this.estimateTokens(rawContent);
       totalOriginalTokens += originalTokens;
 
       // 1. Strip boilerplate
-      let cleanedContent = page.content;
+      let cleanedContent = rawContent;
       boilerplateRegexes.forEach(regex => {
         // Strip out paragraphs or blocks matching boilerplate
         cleanedContent = cleanedContent.replace(new RegExp(`^.*${regex.source}.*$`, 'gim'), '');
