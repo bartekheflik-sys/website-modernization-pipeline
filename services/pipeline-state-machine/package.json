@@ -1,0 +1,15 @@
+{
+  "name": "pipeline-state-machine",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.ts",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.8",
+    "zod": "^3.22.4",
+    "shared-types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

@@ -207,6 +207,44 @@ importers:
         specifier: ^16.4.5
         version: 16.6.1
 
+  services/asset-queue:
+    dependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.39.8
+        version: 2.105.4
+      shared-types:
+        specifier: workspace:*
+        version: link:../../packages/shared-types
+      zod:
+        specifier: ^3.22.4
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.41
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
+  services/context-compression:
+    dependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.39.8
+        version: 2.105.4
+      shared-types:
+        specifier: workspace:*
+        version: link:../../packages/shared-types
+      zod:
+        specifier: ^3.22.4
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.41
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
   services/crawler:
     dependencies:
       '@supabase/supabase-js':
@@ -235,11 +273,68 @@ importers:
         specifier: ^5.0.6
         version: 5.0.6
 
+  services/deterministic-scoring:
+    dependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.39.8
+        version: 2.105.4
+      shared-types:
+        specifier: workspace:*
+        version: link:../../packages/shared-types
+      zod:
+        specifier: ^3.22.4
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.41
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
   services/lovable-bot:
     dependencies:
       shared-types:
         specifier: workspace:*
         version: link:../../packages/shared-types
+
+  services/observability:
+    dependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.39.8
+        version: 2.105.4
+      shared-types:
+        specifier: workspace:*
+        version: link:../../packages/shared-types
+      zod:
+        specifier: ^3.22.4
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.41
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
+  services/pipeline-state-machine:
+    dependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.39.8
+        version: 2.105.4
+      shared-types:
+        specifier: workspace:*
+        version: link:../../packages/shared-types
+      zod:
+        specifier: ^3.22.4
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.41
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
 
   services/prompt-engine:
     dependencies:
