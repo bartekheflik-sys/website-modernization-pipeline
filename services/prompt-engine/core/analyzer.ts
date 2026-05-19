@@ -264,7 +264,14 @@ REQUIRED JSON STRUCTURE:
     } catch (error: any) {
       console.error(`[Analyzer] Attempt ${i + 1} failed:`, error.message);
       if (i === attempts - 1) throw error;
-      await new Promise(r => setTimeout(r, 5000));
+      
+      let backoffDelay = 5000;
+      if (error.message?.includes('429') || error.message?.toLowerCase().includes('quota') || error.message?.toLowerCase().includes('rate limit')) {
+        console.warn(`[Analyzer] Hit Gemini 429 Rate/Quota Limit. Backing off aggressively for 25 seconds to allow rate limit window to clear...`);
+        backoffDelay = 25000;
+      }
+      
+      await new Promise(r => setTimeout(r, backoffDelay));
     }
   }
 

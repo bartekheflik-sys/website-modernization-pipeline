@@ -55,7 +55,7 @@ export class ContextCompressor {
 
       // 2. Navigation/Footer deduplication (Simple block hashing approach)
       const blocks = cleanedContent.split('\n\n');
-      const uniqueBlocks = blocks.filter(block => {
+      const uniqueBlocks = blocks.filter((block: string) => {
         // Only deduplicate large repetitive lists (like navigation links at bottom)
         if (block.includes('* [') && block.split('\n').length > 5) {
           const blockHash = this.hashBlock(block);
