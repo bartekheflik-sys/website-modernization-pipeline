@@ -81,41 +81,38 @@ export class ClassificationEngine {
       Business-critical is true for logos, products, menus, team photos, and unique business photos.
     `;
 
-    try {
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text().trim();
-      const raw = JSON.parse(text);
-      return raw.classifications || [];
-    } catch (error: any) {
-      console.error(`[Classification] Batch Error with gemini-2.5-flash:`, error.message || error);
-      
-      // Self-healing fallback attempt using gemini-1.5-flash
+    let attempts = 3;
+    let delay = 3000; // Start with 3 second delay for rate limits / 503s
+
+    for (let attempt = 1; attempt <= attempts; attempt++) {
       try {
-        console.log(`[Classification] Swapping to self-healing fallback model gemini-1.5-flash...`);
-        const fallbackModel = this.genAI.getGenerativeModel({
-          model: 'gemini-1.5-flash',
-          generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: (model as any).generationConfig?.responseSchema
-          }
-        });
-        const result = await fallbackModel.generateContent(prompt);
+        if (attempt > 1) {
+          console.log(`[Classification] Retrying batch with gemini-2.5-flash (Attempt ${attempt}/${attempts}) after ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          delay *= 2; // Exponential backoff
+        }
+        
+        const result = await model.generateContent(prompt);
         const response = await result.response;
         const text = response.text().trim();
         const raw = JSON.parse(text);
         return raw.classifications || [];
-      } catch (fallbackError: any) {
-        console.error(`[Classification] Fallback model gemini-1.5-flash also failed:`, fallbackError.message || fallbackError);
-        return assets.map((_, i) => ({
-          id: i,
-          category: 'stock',
-          business_critical: false,
-          reasoning: 'Batch processing fallback'
-        }));
+      } catch (error: any) {
+        console.error(`[Classification] Attempt ${attempt} failed: ${error.message || error}`);
+        
+        if (attempt === attempts) {
+          console.error(`[Classification] All ${attempts} attempts failed. Applying graceful default fallback.`);
+          return assets.map((_, i) => ({
+            id: i,
+            category: 'stock',
+            business_critical: false,
+            reasoning: 'Batch processing classification failed after retries'
+          }));
+        }
       }
     }
-
+    
+    return [];
   }
 
   async processProjectAssets(projectId: string) {
