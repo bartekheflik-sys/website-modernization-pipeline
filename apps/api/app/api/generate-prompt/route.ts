@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { generatePromptForProject } from 'prompt-engine/prompt-engine.service';
 import { supabaseAdmin } from '@/lib/supabase';
-import { logPipelineStep, logPipelineError, updateProjectStatus } from '@/lib/pipeline';
+import { logPipelineStep, logPipelineError, transitionProjectState } from '@/lib/pipeline';
+import { PipelineStateMachine } from 'pipeline-state-machine';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +20,7 @@ export async function POST(request: Request) {
     // Verify project exists
     const { data: project, error } = await supabaseAdmin
       .from('projects')
-      .select('id, status')
+      .select('id, status, pipeline_state')
       .eq('id', projectId)
       .single();
 
@@ -27,19 +28,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
 
-    if (project.status === 'generating_prompt') {
-      return NextResponse.json({ error: 'Prompt generation already in progress' }, { status: 409 });
-    }
-
-    if (project.status !== 'analysis_complete' && project.status !== 'completed') {
+    const currentState = project.pipeline_state || project.status || 'pending';
+    if (!PipelineStateMachine.canTransition(currentState as any, 'prompt_generating')) {
       return NextResponse.json(
-        { error: `Project analysis not complete. Current status: ${project.status}. Run /api/analyze first.` },
+        { error: `Cannot run prompt generation. Current state: ${currentState}. Run /api/analyze first.` },
         { status: 400 }
       );
     }
 
     // Log Start
-    await updateProjectStatus(projectId, 'generating_prompt');
+    await transitionProjectState(projectId, 'prompt_generating');
     await logPipelineStep(projectId, 'prompt_generation', 'running', 'Assembling deterministic Lovable prompt from AI intelligence.');
 
     const result = await generatePromptForProject(projectId);
@@ -47,13 +45,13 @@ export async function POST(request: Request) {
     if (result.status === 'failed') {
       await logPipelineError(projectId, 'validator', result.error || 'Prompt validation failed');
       await logPipelineStep(projectId, 'prompt_generation', 'failed', result.error);
-      await updateProjectStatus(projectId, 'failed');
+      await transitionProjectState(projectId, 'failed', { failedStep: 'prompt_generation', reason: result.error });
       return NextResponse.json({ error: result.error }, { status: 500 });
     }
 
     // Log Success
     await logPipelineStep(projectId, 'prompt_generation', 'success', `Successfully generated prompt with ${result.result?.metadata.pages.length} pages.`);
-    await updateProjectStatus(projectId, 'completed');
+    await transitionProjectState(projectId, 'completed');
 
     const response = NextResponse.json(result, { status: 200 });
     response.headers.set('Access-Control-Allow-Origin', '*');
@@ -67,7 +65,7 @@ export async function POST(request: Request) {
     if (projectId) {
       await logPipelineError(projectId, 'storage', msg);
       await logPipelineStep(projectId, 'prompt_generation', 'failed', msg);
-      await updateProjectStatus(projectId, 'failed');
+      await transitionProjectState(projectId, 'failed', { failedStep: 'prompt_generation', reason: msg });
     }
     
     const response = NextResponse.json({ error: msg }, { status: 500 });

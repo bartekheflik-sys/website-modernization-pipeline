@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { crawlWebsite } from 'crawler-service';
 import { supabaseAdmin } from '@/lib/supabase';
-import { logPipelineStep, logPipelineError, updateProjectStatus } from '@/lib/pipeline';
+import { logPipelineStep, logPipelineError, transitionProjectState } from '@/lib/pipeline';
+import { PipelineStateMachine } from 'pipeline-state-machine';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
     // Double check project exists and check status
     const { data: project, error } = await supabaseAdmin
       .from('projects')
-      .select('id, status')
+      .select('id, status, pipeline_state')
       .eq('id', projectId)
       .single();
 
@@ -28,12 +29,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
 
-    if (project.status === 'crawling') {
-      return NextResponse.json({ error: 'Crawler already running' }, { status: 409 });
+    const currentState = project.pipeline_state || project.status || 'pending';
+    if (!PipelineStateMachine.canTransition(currentState as any, 'crawling')) {
+      return NextResponse.json({ error: `Cannot start crawl. Current state: ${currentState}` }, { status: 409 });
     }
 
     // Log Trigger
-    await updateProjectStatus(projectId, 'crawling');
+    await transitionProjectState(projectId, 'crawling');
     await logPipelineStep(projectId, 'crawl', 'running', `Crawl triggered manually for ${url}`);
 
     // Since crawling takes a long time, we run it async in the background.

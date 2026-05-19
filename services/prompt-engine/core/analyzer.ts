@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 import { AIAnalysisSchema, AIAnalysisOutput } from '../schemas/analysis.schema';
 import { DESIGN_DNA_LIBRARY } from '../builders/design-dna.library';
+import { ContextCompressor } from 'context-compression';
 
 export async function runAIAnalysis(pages: any[]): Promise<AIAnalysisOutput> {
   const key = process.env.GEMINI_API_KEY || '';
@@ -93,20 +94,12 @@ export async function runAIAnalysis(pages: any[]): Promise<AIAnalysisOutput> {
     }
   });
 
-  const formattedPages = pages.map(p => ({
-    url: p.url,
-    title: p.title,
-    headings: (p.raw_json?.headings || []).slice(0, 30), 
-    content: (p.content || "").slice(0, 15000), // Massive context window allowed for full menus/catalogs
-    images: (p.raw_json?.images || [])
-      .slice(0, 30)
-      .map((img: any) => ({
-        url: img.url || "",
-        alt: img.alt || ""
-      }))
-  }));
-
-  console.log(`[Analyzer] Sending ${formattedPages.length} pages to Gemini (Strict JSON Mode)...`);
+  // Use the new Context Compressor to prevent Gemini 503 Token Explosion
+  const compressedData = ContextCompressor.compress(pages, { maxTokens: 800000 });
+  
+  console.log(`[Analyzer] Compressed ${compressedData.pagesProcessed} pages.`);
+  console.log(`[Analyzer] Original tokens: ~${compressedData.originalTokens} -> Compressed: ~${compressedData.compressedTokens} (${Math.round(compressedData.compressionRatio * 100)}% reduction)`);
+  console.log(`[Analyzer] Sending data to Gemini (Strict JSON Mode)...`);
 
   const systemPrompt = `
 You are an expert Website Analyzer. Transform raw crawl data into a structured modernization plan.
@@ -166,7 +159,7 @@ REQUIRED JSON STRUCTURE:
 }
 `;
 
-  const prompt = `${systemPrompt}\n\nDATA TO ANALYZE:\n${JSON.stringify(formattedPages)}`;
+  const prompt = `${systemPrompt}\n\nDATA TO ANALYZE:\n${compressedData.unifiedMarkdown}`;
 
   const attempts = 3;
   for (let i = 0; i < attempts; i++) {

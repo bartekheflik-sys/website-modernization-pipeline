@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { analyzeWebsiteData } from 'prompt-engine';
 import { supabaseAdmin } from '@/lib/supabase';
-import { logPipelineStep, logPipelineError, updateProjectStatus } from '@/lib/pipeline';
+import { logPipelineStep, logPipelineError, transitionProjectState } from '@/lib/pipeline';
+import { PipelineStateMachine } from 'pipeline-state-machine';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +20,7 @@ export async function POST(request: Request) {
     // Verify project exists and check status for concurrency protection
     const { data: project, error } = await supabaseAdmin
       .from('projects')
-      .select('id, status')
+      .select('id, status, pipeline_state')
       .eq('id', projectId)
       .single();
 
@@ -27,20 +28,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
 
-    if (project.status === 'analyzing') {
-      return NextResponse.json({ error: 'Analysis already in progress' }, { status: 409 });
-    }
-
-    if (project.status !== 'crawled' && project.status !== 'analysis_complete' && project.status !== 'completed' && project.status !== 'pending' && project.status !== 'failed') {
-      console.log(`[API Analyze] Rejection: Project status is ${project.status}`);
+    const currentState = project.pipeline_state || project.status || 'pending';
+    if (!PipelineStateMachine.canTransition(currentState as any, 'analysis_running')) {
+      console.log(`[API Analyze] Rejection: Project state is ${currentState}`);
       return NextResponse.json(
-        { error: `Project must be crawled before analysis. Current status: ${project.status}` },
+        { error: `Cannot run analysis. Current state: ${currentState}` },
         { status: 400 }
       );
     }
 
     // Log Start
-    await updateProjectStatus(projectId, 'analyzing');
+    await transitionProjectState(projectId, 'analysis_running');
     await logPipelineStep(projectId, 'analysis', 'running', 'Starting AI website analysis via Gemini 2.5 Flash.');
 
     const result = await analyzeWebsiteData(projectId);
@@ -48,13 +46,13 @@ export async function POST(request: Request) {
     if (result.status === 'failed') {
       await logPipelineError(projectId, 'gemini', result.error || 'Unknown analysis error');
       await logPipelineStep(projectId, 'analysis', 'failed', result.error);
-      await updateProjectStatus(projectId, 'failed');
+      await transitionProjectState(projectId, 'failed', { failedStep: 'analysis', reason: result.error });
       return NextResponse.json({ error: result.error }, { status: 500 });
     }
 
     // Log Success
     await logPipelineStep(projectId, 'analysis', 'success', 'Website intelligence successfully extracted and validated.');
-    await updateProjectStatus(projectId, 'analysis_complete');
+    await transitionProjectState(projectId, 'analysis_completed');
 
     const response = NextResponse.json(result, { status: 200 });
     response.headers.set('Access-Control-Allow-Origin', '*');
@@ -68,7 +66,7 @@ export async function POST(request: Request) {
     if (projectId) {
       await logPipelineError(projectId, 'gemini', msg);
       await logPipelineStep(projectId, 'analysis', 'failed', msg);
-      await updateProjectStatus(projectId, 'failed');
+      await transitionProjectState(projectId, 'failed', { failedStep: 'analysis', reason: msg });
     }
     
     const response = NextResponse.json({ error: msg }, { status: 500 });
