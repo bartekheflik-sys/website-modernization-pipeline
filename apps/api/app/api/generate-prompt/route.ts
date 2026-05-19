@@ -51,6 +51,7 @@ export async function POST(request: Request) {
 
     // Log Success
     await logPipelineStep(projectId, 'prompt_generation', 'success', `Successfully generated prompt with ${result.result?.metadata.pages.length} pages.`);
+    await transitionProjectState(projectId, 'prompt_completed');
     await transitionProjectState(projectId, 'completed');
 
     const response = NextResponse.json(result, { status: 200 });
