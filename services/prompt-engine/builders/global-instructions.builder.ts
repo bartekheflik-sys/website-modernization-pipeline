@@ -71,11 +71,14 @@ STRICT MEDIA HANDLING & THUMBNAIL CONSTRAINTS (MANDATORY FOR ALL BUSINESS TYPES)
 MODERNITY LEVEL:
 Build a state-of-the-art modern website, NOT a template. The output must feel premium, high-end, and polished. Every section must have intentional spacing, clear visual hierarchy, and professional typography.
 
-VISUAL EXPERIENCE & STORYTELLING (INDUSTRY-ADAPTED: ${analysis.industry}):
-- Do not just list features; tell a story. The website must feel like an immersive journey tailored specifically for a ${analysis.industry} business.
-- Use visual anchors (icons, thematic graphics, 3D elements) to guide the user's eye down the page.
-- Section-to-section transitions should feel like turning the page of a high-end magazine.
-- Weave the core business value ("${analysis.value_proposition.split('.')[0]}") into the visual narrative across all pages.
+==================================================
+🌟 CRITICAL: VISUAL EXPERIENCE & STORYTELLING 🌟
+==================================================
+(INDUSTRY-ADAPTED: ${analysis.industry})
+- YOU MUST NOT BUILD A BORING, FLAT TEMPLATE. You MUST build an IMMERSIVE, NARRATIVE-DRIVEN JOURNEY tailored specifically for a ${analysis.industry} business!
+- STORYTELLING IS MANDATORY: Do not just list features. You MUST weave the core business value ("${analysis.value_proposition.split('.')[0]}") into a rich visual story across the page.
+- VISUAL ANCHORS: You MUST use high-end visual anchors (abstract 3D elements, thematic graphics, massive immersive typography) to aggressively guide the user's eye.
+- Section-to-section transitions MUST feel like turning the page of an ultra-premium magazine.
 
 MOTION SYSTEM (Level: ${motionLevel.toUpperCase()}):
 ${motionDescriptions[motionLevel]}
