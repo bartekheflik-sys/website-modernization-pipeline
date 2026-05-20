@@ -130,7 +130,11 @@ Every section must be production-ready. No placeholder content. No "Lorem ipsum"
 
 STRUCTURAL FIDELITY & NAVIGATION:
 - BREADCRUMBS & BACK NAVIGATION: Every sub-page (non-home) must include clear back-navigation (Breadcrumbs or a "Back to [Parent]" arrow/link) near the top of the page.
-- LANGUAGE CONSISTENCY: Maintain the exact multi-language structure if detected in the original (e.g. including a Language Switcher in the nav if /en/ or /hu/ paths were present).
+- MANDATORY DUAL-LANGUAGE SYSTEM (ENGLISH + ORIGINAL LOCAL LANGUAGE):
+  - Every website you generate MUST support exactly two languages: (1) The original native language of the crawled legacy website, and (2) English.
+  - Exception: If the crawled website's native language is already English, you only need to support English.
+  - You MUST implement a highly visible, fully functional Language Switcher in the Header/Navbar navigation (e.g., a stylish dropdown or switch toggle: "EN | HU", "EN | PL", etc.).
+  - All content, buttons, menu items, sections, and copy MUST be translated fully so that toggling the switcher dynamically changes the entire page's language in a clean, state-controlled manner (e.g., using a React state dictionary or simple translation hook).
 - NAVIGATION DEPTH: Mirror the original site's depth. If it was a deep multi-page site, do not flatten it into a single-page layout unless specifically instructed.
 `.trim();
 }
