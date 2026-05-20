@@ -81,6 +81,7 @@ Follow the instructions below with surgical precision. Prioritize business authe
 
 4. WCAG AA ACCESSIBILITY & HIGH CONTRAST TEXT (NO BLENDING):
    - You MUST ensure absolute legibility of all written copy. Text color MUST NOT blend into the background color!
+   - DYNAMIC IMAGE BACKGROUND PROTECTION: When placing text (like Navigation links, Hero titles, or overlay text) on top of photographs or varying backgrounds, you MUST protect the text readability! Use a dark gradient overlay on the image (e.g., \`bg-gradient-to-b from-black/80 via-black/20 to-transparent\` at the top for navbars), apply strong text shadows (e.g., \`drop-shadow-lg\` or custom text-shadow), or use a glassmorphic/dark backdrop for the navbar.
    - For dark themes (like dark glassmorphism): Use pure white (#FFFFFF), slate-100, or high-brightness text for all headers and body copy. Never use mid-tone greys, dark slate, or low-contrast text on dark backgrounds.
    - For buttons and callouts: Ensure text placed on top of colored gradients or bright background accents has a highly contrasting color (e.g., pure black or dark navy text on yellow/cyan/green buttons, and pure white text on dark blue/purple gradients).
 

@@ -20,9 +20,11 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`${inter.className} bg-background text-foreground antialiased`}>
         <Providers>
-          <div className="flex h-screen overflow-hidden">
-            <Sidebar />
-            <main className="flex-1 overflow-y-auto bg-transparent">
+          <div className="flex min-h-screen">
+            <div className="sticky top-0 h-screen z-40">
+              <Sidebar />
+            </div>
+            <main className="flex-1 bg-transparent min-w-0">
               <div className="p-8">
                 {children}
               </div>

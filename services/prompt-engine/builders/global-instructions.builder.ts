@@ -76,9 +76,33 @@ Build a state-of-the-art modern website, NOT a template. The output must feel pr
 ==================================================
 (INDUSTRY-ADAPTED: ${analysis.industry})
 - YOU MUST NOT BUILD A BORING, FLAT TEMPLATE. You MUST build an IMMERSIVE, NARRATIVE-DRIVEN JOURNEY tailored specifically for a ${analysis.industry} business!
-- STORYTELLING IS MANDATORY: Do not just list features. You MUST weave the core business value ("${analysis.value_proposition.split('.')[0]}") into a rich visual story across the page.
-- VISUAL ANCHORS: You MUST use high-end visual anchors (abstract 3D elements, thematic graphics, massive immersive typography) to aggressively guide the user's eye.
-- Section-to-section transitions MUST feel like turning the page of an ultra-premium magazine.
+
+THE CORE PRINCIPLES OF MODERN CINEMATIC UI (MANDATORY EXECUTION):
+
+1. MOTION SHOULD EXPLAIN, NOT DECORATE
+Bad motion: random floating, every element fades/slides, animations competing everywhere.
+Premium motion: guides attention, reveals hierarchy, transitions state, supports storytelling.
+Examples to implement:
+- text fades as next section enters
+- cards tilt slightly on hover
+- objects react to scroll depth
+- background moves slower than foreground
+- scene transitions feel continuous
+Think: camera movement, choreography, pacing. Not: “add animation to everything.”
+
+2. DEPTH IS THE SECRET
+The best modern sites feel like layered space.
+You MUST use: blurred backgrounds, translucent surfaces, gradient fog, shadow depth, perspective transforms, scale differences, parallax layers, and z-axis movement.
+This creates immersion, premium feel, and “3D without actual 3D”.
+
+3. SPACING IS WHAT MAKES MOTION FEEL EXPENSIVE
+Most people ruin immersive UI because everything is too close together, sections are cramped, and typography lacks breathing room.
+Premium sites often use: huge vertical spacing, oversized headings, minimal text blocks, isolated focal points. The animation then has room to breathe.
+
+4. STORYTELLING > SECTIONS
+Average websites: Hero, Features, Pricing, FAQ.
+Cinematic websites: Scene 1, Reveal, Transition, Emotional shift, Depth moment, Interactive section, Climax, CTA.
+You’re building an experience, not a page. Section-to-section transitions MUST feel like turning the page of an ultra-premium magazine.
 
 MOTION SYSTEM (Level: ${motionLevel.toUpperCase()}):
 ${motionDescriptions[motionLevel]}
