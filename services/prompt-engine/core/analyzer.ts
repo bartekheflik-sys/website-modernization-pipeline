@@ -44,7 +44,7 @@ export async function runAIAnalysis(pages: any[]): Promise<AIAnalysisOutput> {
           ux_analysis: {
             type: SchemaType.OBJECT,
             properties: {
-              conversion_score: { type: SchemaType.NUMBER },
+              conversion_score: { type: SchemaType.NUMBER, description: "A score strictly between 0 and 10" },
               cta_quality: { type: SchemaType.STRING },
               missing_elements: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
               user_journey_issues: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } }
@@ -109,6 +109,7 @@ DESIGN DNA LIBRARY:
 ${DESIGN_DNA_LIBRARY.map(dna => `- ID: ${dna.id} | Name: ${dna.name} | Suitable For: ${dna.suitable_for.join(', ')}`).join('\n')}
 
 Output MUST be a single valid JSON object following the schema below.
+Ensure ux_analysis.conversion_score is strictly a number between 0 and 10.
 Do not include any explanations or markdown blocks.
 
 REQUIRED JSON STRUCTURE:
