@@ -61,15 +61,16 @@ Follow the instructions below with surgical precision. Prioritize business authe
    - SEMANTIC MAPPING: If a menu section is about "Pizza", find the filename in the manifest that matches Pizza (e.g. './Pizza.jpg'). If it's about "Zapiekanki", map it to the exact Zapiekanki photo (e.g. './Zapiekanki.jpg').
    - NO LAZY GALLERY LOOPS: When rendering image galleries, grids, or product lists, you MUST NOT duplicate the same image multiple times (e.g., do not use \`Array(9).fill('./photo.jpg')\`). You MUST use distinct, unique photos from the Asset Manifest for every single gallery item and product card.
 
-2. CINEMATIC HIGH-MOTION FRAMEWORK (FRAMER MOTION):
-   - You MUST build a highly-dynamic, premium web experience with fluid animations using Framer Motion. 
+2. CINEMATIC HIGH-MOTION FRAMEWORK (MANDATORY FRAMER MOTION):
+   - CRITICAL: You MUST use the "framer-motion" library. Import it and wrap your UI elements in <motion.div>.
+   - You MUST build a highly-dynamic, premium web experience with fluid animations. If a page has no motion, you have failed.
    - DO NOT make a basic scroll template. Make the site feel alive and premium!
    - IMPLEMENT THE FOLLOWING MOTION FEATURES:
      * Parallax Hero Scroll: The hero background scaling smoothly on scroll with vertical offset.
      * Stacked Specialties Deck: Sticky specialty sections or cards that stack on top of each other dynamically on scroll.
      * Horizontal Scroll Showcase: Map vertical scroll progress on desktop to horizontal translate of featured cards or product highlights.
      * Continuous Tagline Marquees: Seamless, infinite running marquees behind sections at low opacity.
-     * Staggered Spring Entrances: Spring physics (stiffness 120, damping 14) for all menu items and buttons.
+     * Staggered Spring Entrances: Spring physics (stiffness 120, damping 14) for all menu items and cards as they enter the viewport using \`whileInView\`.
    - Legibility Lock: Keep all paragraphs and body copy text 100% static for perfect reading comfort.
 
 3. STRICT NAVIGATION ARCHITECTURE & BANNED ELEMENTS:
@@ -89,7 +90,7 @@ Follow the instructions below with surgical precision. Prioritize business authe
    - IMAGES AND PRODUCTS: You MUST preserve the original visual quality of all crawled images. NEVER stretch or scale up images beyond their native dimensions, as this causes severe pixelation. 
    - GRID & MASONRY CLAMPING: CSS Grids and Flexbox columns often forcefully stretch images to fill large desktop screens. You MUST prevent this! Apply strict max-width constraints (e.g. \`max-w-[400px]\`, \`w-fit\`, or \`mx-auto\`) to image containers. A low-resolution photo must NEVER be blown up to fill a massive grid cell!
    - SCALING: Render images either in their original size or smaller using clean CSS properties like \`object-fit: contain\` or \`object-scale-down\` to prevent aspect-ratio distortion and upscaling.
-   - AI BACKGROUNDS ALLOWANCE: You may use premium, high-resolution AI-generated or Unsplash images EXCLUSIVELY for full-width section backgrounds (like the Hero parallax background) to make the site look high quality.
+   - AI BACKGROUNDS ALLOWANCE & FALLBACK: You MUST use premium, high-resolution Unsplash image URLs for full-width section backgrounds (like the Hero background). CRITICAL: Because Unsplash links can sometimes break, you MUST ALWAYS implement a rich CSS gradient fallback on the parent container (e.g., \`bg-gradient-to-br from-primary/10 via-background to-primary/5\`) so that if the image fails to load, the section does not look like empty, broken white space!
    - AI CONTENT BAN: You MUST NOT use AI-generated or external placeholder images for specific content items like Products, Menu Items, or Galleries. Content items MUST use the authentic crawled photos.
 
 ==================================================
