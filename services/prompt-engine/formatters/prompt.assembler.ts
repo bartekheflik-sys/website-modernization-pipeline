@@ -93,6 +93,29 @@ Follow the instructions below with surgical precision. Prioritize business authe
    - AI BACKGROUNDS ALLOWANCE & FALLBACK: You MUST use premium, high-resolution Unsplash image URLs for full-width section backgrounds (like the Hero background). CRITICAL: Because Unsplash links can sometimes break, you MUST ALWAYS implement a rich CSS gradient fallback on the parent container (e.g., \`bg-gradient-to-br from-primary/10 via-background to-primary/5\`) so that if the image fails to load, the section does not look like empty, broken white space!
    - AI CONTENT BAN: You MUST NOT use AI-generated or external placeholder images for specific content items like Products, Menu Items, or Galleries. Content items MUST use the authentic crawled photos.
 
+6. MANDATORY GDPR COMPLIANCE — COOKIES BANNER & PRIVACY POLICY:
+   Every website you generate MUST include the following two components. These are non-negotiable legal requirements:
+
+   A. COOKIE CONSENT BANNER:
+   - Implement a sticky bottom-of-screen cookie consent banner that appears on first visit (use localStorage to remember consent).
+   - The banner MUST include:
+     * A short, friendly message: e.g. "We use cookies to improve your experience. By continuing, you agree to our Privacy Policy."
+     * A "Accept All" primary button (bg-primary text-primary-foreground).
+     * A "Reject Non-Essential" secondary button (outlined/ghost style).
+     * A clickable "Privacy Policy" link that navigates to /privacy-policy.
+   - The banner must be styled with the site's design tokens (glassmorphism bg-[hsl(var(--surface)/0.9)] backdrop-blur border-t border-[hsl(var(--glass-border))]).
+   - It must be dismissible and MUST NOT reappear after the user has accepted/rejected (persist decision in localStorage key: "cookie_consent").
+   - It must be fully responsive and accessible (keyboard focusable, ARIA role="dialog").
+
+   B. PRIVACY POLICY PAGE (/privacy-policy):
+   - Add a dedicated \`/privacy-policy\` route.
+   - The page must include a clean, well-formatted legal text covering: (1) what data is collected, (2) how cookies are used, (3) third-party services (Google Analytics, etc.), (4) user rights under GDPR, (5) contact details for data queries.
+   - Use the business name and contact info from the crawled data to fill in the legal text.
+   - Style it as a clean, readable long-form content page: max-width 800px centered, large line-height, clear H2 section headings.
+   - Add a "← Back to Home" link at the top.
+   - The Privacy Policy link in the Footer MUST link to /privacy-policy.
+   - The Cookie Banner's "Privacy Policy" link MUST also link to /privacy-policy.
+
 ==================================================
 LOVABLE WEBSITE GENERATION PROMPT
 ==================================================
