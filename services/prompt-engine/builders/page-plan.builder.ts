@@ -114,7 +114,7 @@ VISUAL HIERARCHY: H1 (most prominent) → H2 (section titles) → body (comforta
 --- PAGE: BLOG POST DETAIL (/blog/:slug) ---
 CRITICAL ROUTING REQUIREMENTS:
 - You MUST implement a dynamic detail route: /blog/:slug (React Router) or /blog/[slug] (Next.js).
-- INTERNAL SUBPAGE ONLY (NO EXTERNAL LINKS): The blog posts MUST open as internal subpages on the website. You MUST NOT use external links (like https://...) or `target="_blank"`.
+- INTERNAL SUBPAGE ONLY (NO EXTERNAL LINKS): The blog posts MUST open as internal subpages on the website. You MUST NOT use external links (like https://...) or target="_blank".
 - BUTTON CLICKABILITY: The "Czytaj dalej" (Read more) button on every blog card MUST be fully functional! Wrap the button (or the entire card) properly using the React Router <Link to="/blog/post-slug"> component. Do NOT use an empty href="#" or a dead <button>.
 - A blog listing page with cards or "Czytaj dalej" buttons that do NOT navigate to the internal article subpage is considered a CRITICAL BUILD FAILURE.
 - Store blog posts as a typed array of objects (id, slug, title, category, date, readTime, image, content, tags).
