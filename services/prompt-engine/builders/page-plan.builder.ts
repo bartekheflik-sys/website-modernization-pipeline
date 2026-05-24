@@ -66,6 +66,20 @@ export function buildPagePlan(analysis: AIAnalysisOutput): string {
 
   const sections = lovable_prompt_data.sections_per_page;
 
+  // Detect if a blog page exists
+  const hasBlog = pages.some(p =>
+    normalize(p).includes('blog') ||
+    normalize(p).includes('article') ||
+    normalize(p).includes('news') ||
+    normalize(p).includes('post') ||
+    normalize(p).includes('aktual') ||
+    normalize(p).includes('wpis')
+  ) || detectedPages.some(p =>
+    normalize(p).includes('blog') ||
+    normalize(p).includes('article') ||
+    normalize(p).includes('news')
+  );
+
   const pageBlocks = pages.map((page, index) => {
     const pageSections = sections[page] || [];
     const isHome = index === 0;
@@ -93,6 +107,31 @@ CONVERSION INTENT: ${conversionGoal}
 VISUAL HIERARCHY: H1 (most prominent) → H2 (section titles) → body (comfortable reading) → CTAs (high-contrast, unmissable)`.trim();
   });
 
+  // Build the mandatory blog post detail page block if blog is detected
+  const blogDetailBlock = hasBlog ? `
+
+⚠️⚠️⚠️ MANDATORY BLOG POST DETAIL PAGE — DO NOT SKIP ⚠️⚠️⚠️
+--- PAGE: BLOG POST DETAIL (/blog/:slug) ---
+PURPOSE: Display the full content of a single blog article when a user clicks any blog post card.
+
+CRITICAL ROUTING REQUIREMENTS:
+- You MUST implement a dynamic detail route: /blog/:slug (React Router) or /blog/[slug] (Next.js).
+- Every single blog card on the blog listing page MUST be wrapped in a clickable <Link to="/blog/post-slug"> or <a href="/blog/post-slug"> that navigates to this page.
+- A blog listing page with cards that are NOT clickable is considered a CRITICAL BUILD FAILURE.
+- Store blog posts as a typed array of objects (id, slug, title, category, date, readTime, image, content, tags).
+
+REQUIRED SECTIONS (IN ORDER):
+   1. [BACK NAVIGATION] — "← Back to Blog" link top-left, styled subtly with hover underline
+   2. [ARTICLE HEADER] — Large H1 title, category tag pill, publish date, estimated read time badge
+   3. [HERO IMAGE] — Full-width article banner image (max-height: 480px, object-fit: cover, rounded-lg)
+   4. [ARTICLE BODY] — Full article content as rich paragraphs with H2/H3 subheadings. Each post must have UNIQUE, substantive content (minimum 3 paragraphs) matching the business topic.
+   5. [TAGS] — Clickable tag chips that link back to the blog listing filtered by that category
+   6. [RELATED POSTS] — 2–3 related article cards at the bottom, also clickable to their own detail pages
+   7. [CTA] — Subtle business-relevant call-to-action (e.g. "Book a repair consultation" for a Hi-Fi repair shop)
+
+ANIMATION: Article body reveals with staggered paragraph fade-ins on scroll (Framer Motion whileInView, opacity 0→1, y: 20→0, staggerChildren: 0.08).`.trim()
+  : '';
+
   return `
 ==================================================
 B. PAGE-BY-PAGE GENERATION PLAN
@@ -105,5 +144,6 @@ TOTAL PAGES: ${pages.length}
 PAGES: ${pages.join(' | ')}
 
 ${pageBlocks.join('\n\n')}
+${blogDetailBlock}
 `.trim();
 }
