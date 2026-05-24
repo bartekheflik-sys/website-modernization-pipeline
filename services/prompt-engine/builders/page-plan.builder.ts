@@ -116,6 +116,7 @@ CRITICAL ROUTING REQUIREMENTS:
 - You MUST implement a dynamic detail route: /blog/:slug (React Router) or /blog/[slug] (Next.js).
 - INTERNAL SUBPAGE ONLY (NO EXTERNAL LINKS): The blog posts MUST open as internal subpages on the website. You MUST NOT use external links (like https://...) or target="_blank".
 - BUTTON CLICKABILITY: The "Czytaj dalej" (Read more) button on every blog card MUST be fully functional! Wrap the button (or the entire card) properly using the React Router <Link to="/blog/post-slug"> component. Do NOT use an empty href="#" or a dead <button>.
+- STRICT ROUTING GUARDRAIL: Do NOT link the "Czytaj dalej" button to `/serwis` or any other unrelated page! It MUST link strictly to the `/blog/:slug` dynamic route!
 - A blog listing page with cards or "Czytaj dalej" buttons that do NOT navigate to the internal article subpage is considered a CRITICAL BUILD FAILURE.
 - Store blog posts as a typed array of objects (id, slug, title, category, date, readTime, image, content, tags).
 
@@ -123,14 +124,14 @@ REQUIRED SECTIONS (IN ORDER):
    1. [BACK NAVIGATION] — "← Back to Blog" link top-left, styled subtly with hover underline
    2. [ARTICLE HEADER] — Large H1 title, category tag pill, publish date, estimated read time badge
    3. [HERO IMAGE] — Full-width article banner image (max-height: 480px, object-fit: cover, rounded-lg)
-   4. [ARTICLE BODY] — Full article content as rich paragraphs with H2/H3 subheadings. Each post must have UNIQUE, substantive content (minimum 3 paragraphs) matching the business topic.
+   4. [ARTICLE BODY] — You MUST use the EXACT, verbatim original text for the blog posts provided in the 'VERBATIM ORIGINAL CONTENT TO PRESERVE' section. Do NOT summarize or invent new text. Render the original text as rich paragraphs with H2/H3 subheadings.
    5. [TAGS] — Clickable tag chips that link back to the blog listing filtered by that category
    6. [RELATED POSTS] — 2–3 related article cards at the bottom, also clickable to their own detail pages
    7. [CTA] — Subtle business-relevant call-to-action (e.g. "Book a repair consultation" for a Hi-Fi repair shop)
 
 DATA & CONTENT RULES FOR BLOG POSTS:
 - NO FAKE TOPICS: You MUST NOT invent random or generic blog post topics! 
-- DERIVE TOPICS FROM IMAGES: You MUST derive the blog post titles and topics STRICTLY from the filenames listed in the Website Asset Manifest. For example, if you see an image named "marantz-2230.jpg", you MUST create a blog post specifically about the "Marantz 2230" and use that exact image as its thumbnail and hero image.
+- DERIVE TOPICS FROM IMAGES & TEXT: You MUST derive the blog post titles and topics STRICTLY from the original crawled pages and the filenames listed in the Website Asset Manifest. 
 - STRICT PHOTO MATCHING: Every single blog post MUST have a perfectly matching photo from the manifest. Do NOT assign a photo of a Yamaha receiver to a blog post about a Sony cassette deck. Match the file name contextually to the post topic!
 
 ANIMATION: Article body reveals with staggered paragraph fade-ins on scroll (Framer Motion whileInView, opacity 0→1, y: 20→0, staggerChildren: 0.08).`.trim()
