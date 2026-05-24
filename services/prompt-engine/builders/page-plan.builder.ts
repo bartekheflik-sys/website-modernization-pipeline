@@ -99,10 +99,11 @@ export function buildPagePlan(analysis: AIAnalysisOutput, crawledPages: any[] = 
     if (isHome) {
       if (hasBlog) {
         homeTypeSection = `\n   [MANDATORY — LATEST POSTS PREVIEW]: Render a "Najnowsze posty" / "Latest Posts" blog feed section on the home page.\n` +
+          `   HARDCODED DATA ARRAY REQUIRED: You MUST create a hardcoded \`blogPosts\` array using the titles and slugs from the BLOG POST IMAGE MANIFEST so the cards map to real posts.\n` +
           `   Show the 3 most recent blog post cards in a responsive grid (1-col mobile, 2-col tablet, 3-col desktop).\n` +
           `   Each card MUST contain: title (H3), publish date, 2-sentence excerpt, featuredImage thumbnail (max 200px width, rounded, object-fit cover), and a "Czytaj dalej →" / "Read More →" link.\n` +
           `   ⛔ Card images MUST use the exact featuredImage URL from the BLOG POST IMAGE MANIFEST — NOT the author profile photo.\n` +
-          `   ⛔ Each "Czytaj dalej" link MUST be a React Router <Link to="/blog/:slug"> — NOT an external link, NOT href="#".\n` +
+          `   ⛔ Each "Czytaj dalej" link MUST be a React Router <Link to={\`/blog/\${post.slug}\`}> — NEVER an external link, NEVER href="#".\n` +
           `   Cards must have hover lift animation (translateY -4px, shadow-card-hover) and smooth transition (0.25s ease-out).`;
       } else if (hasPortfolio) {
         homeTypeSection = `\n   [MANDATORY — FEATURED WORK]: A stunning masonry grid or horizontal scroll showcase of the 4 best portfolio pieces. Use original project thumbnails. Hover states must reveal the project title. Add a "View All Projects" CTA linking to /portfolio.`;
