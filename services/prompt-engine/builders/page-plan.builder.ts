@@ -128,6 +128,11 @@ REQUIRED SECTIONS (IN ORDER):
    6. [RELATED POSTS] — 2–3 related article cards at the bottom, also clickable to their own detail pages
    7. [CTA] — Subtle business-relevant call-to-action (e.g. "Book a repair consultation" for a Hi-Fi repair shop)
 
+DATA & CONTENT RULES FOR BLOG POSTS:
+- NO FAKE TOPICS: You MUST NOT invent random or generic blog post topics! 
+- DERIVE TOPICS FROM IMAGES: You MUST derive the blog post titles and topics STRICTLY from the filenames listed in the Website Asset Manifest. For example, if you see an image named "marantz-2230.jpg", you MUST create a blog post specifically about the "Marantz 2230" and use that exact image as its thumbnail and hero image.
+- STRICT PHOTO MATCHING: Every single blog post MUST have a perfectly matching photo from the manifest. Do NOT assign a photo of a Yamaha receiver to a blog post about a Sony cassette deck. Match the file name contextually to the post topic!
+
 ANIMATION: Article body reveals with staggered paragraph fade-ins on scroll (Framer Motion whileInView, opacity 0→1, y: 20→0, staggerChildren: 0.08).`.trim()
   : '';
 
