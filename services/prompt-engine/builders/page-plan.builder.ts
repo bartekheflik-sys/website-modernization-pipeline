@@ -134,12 +134,11 @@ VISUAL HIERARCHY: H1 (most prominent) → H2 (section titles) → body (comforta
 ⚠️⚠️⚠️ MANDATORY BLOG POST DETAIL PAGE — DO NOT SKIP ⚠️⚠️⚠️
 --- PAGE: BLOG POST DETAIL (/blog/:slug) ---
 CRITICAL ROUTING REQUIREMENTS:
-- You MUST implement a dynamic detail route: /blog/:slug (React Router) or /blog/[slug] (Next.js).
-- INTERNAL SUBPAGE ONLY (NO EXTERNAL LINKS): The blog posts MUST open as internal subpages on the website. You MUST NOT use external links or target="_blank".
-- BUTTON CLICKABILITY: The "Czytaj dalej" (Read more) button on every blog card MUST be fully functional! Wrap the button (or the entire card) properly using the React Router <Link to="/blog/post-slug"> component. Do NOT use empty href="#" or dead <button>.
-- STRICT ROUTING GUARDRAIL: Do NOT link the "Czytaj dalej" button to unrelated pages. It MUST link strictly to the /blog/:slug dynamic route.
-- Store blog posts as a typed array of objects (id, slug, title, category, date, readTime, image, content, tags, sourceUrl).
-- The "sourceUrl" field must be set to the EXACT original Blogger post URL from the BLOG POST IMAGE MANIFEST so that the article body shows the same content as on the original page.
+- You MUST implement a dynamic detail route: \`/blog/:slug\` (React Router) or \`/blog/[slug]\` (Next.js).
+- INTERNAL SUBPAGE ONLY (NO EXTERNAL LINKS): The blog posts MUST open as internal subpages on the website.
+- HARDCODED DATA ARRAY REQUIRED: To make the "Czytaj dalej" link work, you MUST create a hardcoded \`blogPosts\` array in your code containing the titles, slugs, and featuredImage URLs extracted from the BLOG POST IMAGE MANIFEST. 
+- BUTTON CLICKABILITY: The "Czytaj dalej" (Read more) button on every blog card MUST be fully functional! Wrap it properly using the React Router \`<Link to={\`/blog/\${post.slug}\`}>\`. Do NOT use empty \`href="#"\` or dead \`<button>\`.
+- STRICT ROUTING GUARDRAIL: Do NOT link the "Czytaj dalej" button to unrelated pages. It MUST link strictly to the dynamic route using the post's unique slug.
 
 REQUIRED SECTIONS (IN ORDER):
    1. [BACK NAVIGATION] — "← Back to Blog" link top-left, styled subtly with hover underline
