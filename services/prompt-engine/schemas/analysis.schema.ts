@@ -7,7 +7,22 @@ export const AIAnalysisSchema = z.object({
   business_model: z.string(),
   core_services: z.array(z.string()),
   value_proposition: z.string(),
+  /** ISO 639-1 language code of the crawled site's primary language, e.g. "en", "pl", "de" */
+  detected_language: z.string().optional().default('en'),
   
+  website_type: z.enum([
+    'blog',
+    'landing_page',
+    'portfolio',
+    'restaurant',
+    'ecommerce',
+    'corporate',
+    'saas',
+    'news',
+    'educational',
+    'personal'
+  ]).optional().default('corporate'),
+
   content_analysis: z.object({
     pages_detected: z.array(z.string()),
     missing_pages: z.array(z.string()),

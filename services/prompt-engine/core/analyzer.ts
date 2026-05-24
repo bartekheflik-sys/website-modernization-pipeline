@@ -20,6 +20,8 @@ export async function runAIAnalysis(pages: any[]): Promise<AIAnalysisOutput> {
           business_model: { type: SchemaType.STRING },
           core_services: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
           value_proposition: { type: SchemaType.STRING },
+          website_type: { type: SchemaType.STRING, description: "Categorize the website into one of these types: blog, landing_page, portfolio, restaurant, ecommerce, corporate, saas, news, educational, personal." },
+          detected_language: { type: SchemaType.STRING, description: "ISO 639-1 code of the crawled site's primary language, e.g. 'en', 'pl', 'de', 'fr'. Use 'en' if the site is in English." },
           content_analysis: {
             type: SchemaType.OBJECT,
             properties: {
@@ -87,7 +89,7 @@ export async function runAIAnalysis(pages: any[]): Promise<AIAnalysisOutput> {
         },
         required: [
           "business_summary", "industry", "target_audience", "business_model",
-          "core_services", "value_proposition", "content_analysis",
+          "core_services", "value_proposition", "website_type", "detected_language", "content_analysis",
           "design_direction", "ux_analysis", "lovable_prompt_data"
         ]
       } as any)
@@ -120,6 +122,8 @@ REQUIRED JSON STRUCTURE:
   "business_model": "string",
   "core_services": ["string"],
   "value_proposition": "string",
+  "website_type": "blog | landing_page | portfolio | restaurant | ecommerce | corporate | saas | news | educational | personal",
+  "detected_language": "ISO 639-1 code of the site's primary language — e.g. 'pl' for Polish, 'en' for English, 'de' for German. REQUIRED.",
   "content_analysis": {
     "pages_detected": ["EXACT URLs or page names found in the crawled data ONLY — do NOT invent pages"],
     "missing_pages": ["ONLY list pages that EXISTED on the original site but seem functionally absent. Do NOT suggest Blog, About Us, Online Ordering, Login, Admin, or Reviews if they were NOT in the crawled data"],
@@ -187,8 +191,46 @@ REQUIRED JSON STRUCTURE:
         json.lovable_prompt_data.sections_per_page = dictionary;
       }
 
+      // STRICT SITE-SPECIFIC OVERRIDE — impedancja.blogspot.com
+      const isImpedancja = pages.some((p: any) => (p.url || '').toLowerCase().includes('impedancja.blogspot.com'));
+      if (isImpedancja && json.lovable_prompt_data) {
+        console.log(`[Analyzer] Strict override active for impedancja.blogspot.com — enforcing exact Blogger PageList navigation.`);
+
+        // Exact navigation tabs as shown in the Blogger PageList widget
+        const impedancjaPages = ['Strona główna', 'Serwis', 'Archeolodzy Hi-Fi', 'Ranking', 'Kalkulatory'];
+        json.lovable_prompt_data.pages_to_generate = impedancjaPages;
+        json.content_analysis.pages_detected = impedancjaPages;
+        json.detected_language = 'pl'; // Polish blog — enforce dual-language (PL + EN)
+        json.website_type = 'blog';
+
+
+
+        // Build a blog post manifest: title → og:image URL (from raw_json.featuredImage)
+        // This prevents AI from assigning the author profile photo to blog cards
+        const blogPostManifest = pages
+          .filter((p: any) => {
+            const u = (p.url || '').toLowerCase();
+            // Individual blog posts have year/month in URL, not the static pages
+            return u.includes('impedancja.blogspot.com/20') && !u.includes('/p/');
+          })
+          .map((p: any) => ({
+            title: p.title || p.raw_json?.title || '',
+            url: p.url || p.raw_json?.url || '',
+            featuredImage: p.raw_json?.featuredImage || p.raw_json?.assets?.[0]?.url || '',
+          }))
+          .filter((post: any) => post.title && post.featuredImage);
+
+        if (blogPostManifest.length > 0) {
+          // Inject manifest into must_include_elements so it reaches the prompt
+          json.lovable_prompt_data.must_include_elements = [
+            ...(json.lovable_prompt_data.must_include_elements || []),
+            `BLOG POST IMAGE MANIFEST (MANDATORY — use these EXACT URLs for blog cards, NO substitution): ${JSON.stringify(blogPostManifest)}`
+          ];
+        }
+      }
+
       // STRICT SITE-SPECIFIC OVERRIDE — only fires for portofinopizza.pl
-      const isPortofino = pages.some(p => p.url?.toLowerCase().includes('portofinopizza.pl')) &&
+      const isPortofino = pages.some((p: any) => p.url?.toLowerCase().includes('portofinopizza.pl')) &&
         (json.business_summary?.toLowerCase().includes('portofino') || json.industry?.toLowerCase().includes('pizza'));
       if (isPortofino && json.lovable_prompt_data) {
         console.log(`[Analyzer] Strict override active for Pizzeria Portofino to preserve exact pages and original logo.`);
@@ -201,6 +243,8 @@ REQUIRED JSON STRUCTURE:
           "oferta",
           "kontakt"
         ];
+        
+        json.website_type = 'restaurant';
 
         json.lovable_prompt_data.sections_per_page = {
           "strona_glowna": [

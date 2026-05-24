@@ -125,16 +125,60 @@ ACCESSIBILITY:
 - Color contrast must meet WCAG AA standards — use foreground/background token pairings
 - Focus states must be visible for keyboard navigation
 
-QUALITY GATE:
-Every section must be production-ready. No placeholder content. No "Lorem ipsum". Use industry-appropriate copy derived from the business context below.
-
-STRUCTURAL FIDELITY & NAVIGATION:
-- BREADCRUMBS & BACK NAVIGATION: Every sub-page (non-home) must include clear back-navigation (Breadcrumbs or a "Back to [Parent]" arrow/link) near the top of the page.
-- MANDATORY DUAL-LANGUAGE SYSTEM (ENGLISH + ORIGINAL LOCAL LANGUAGE):
-  - Every website you generate MUST support exactly two languages: (1) The original native language of the crawled legacy website, and (2) English.
-  - Exception: If the crawled website's native language is already English, you only need to support English.
-  - You MUST implement a highly visible, fully functional Language Switcher in the Header/Navbar navigation (e.g., a stylish dropdown or switch toggle: "EN | HU", "EN | PL", etc.).
-  - All content, buttons, menu items, sections, and copy MUST be translated fully so that toggling the switcher dynamically changes the entire page's language in a clean, state-controlled manner (e.g., using a React state dictionary or simple translation hook).
+QUALITY GATE & ZERO-HALLUCINATION GUARD:
+- ⛔ STRICT ZERO-HALLUCINATION RULE: Under no circumstances are you allowed to invent, simulate, or fabricate any facts, details, or assets. You MUST render ONLY the authentic products, services, bios, prices, phone numbers, addresses, and content found in the original crawled pages.
+- If specific details (e.g. phone or address) are not provided in the legacy content, you MUST omit those fields or use a clearly-labeled empty placeholder (e.g., "[Configure Contact Details]"), never a realistic mock value.
+- Every section must be production-ready. No placeholder content.
 - NAVIGATION DEPTH: Mirror the original site's depth. If it was a deep multi-page site, do not flatten it into a single-page layout unless specifically instructed.
+- BREADCRUMBS & BACK NAVIGATION: Every sub-page (non-home) must include clear back-navigation (Breadcrumbs or a "Back to [Parent]" arrow/link) near the top of the page.
+${buildLanguageInstruction(analysis)}
 `.trim();
+}
+
+/**
+ * Generates conditional language switching instructions based on the site's detected native language.
+ * English-only sites: no switcher at all.
+ * Non-English sites: native language + English switcher placed next to the logo.
+ */
+function buildLanguageInstruction(analysis: AIAnalysisOutput): string {
+  const lang = (analysis.detected_language || 'en').toLowerCase().trim();
+
+  if (lang === 'en') {
+    return `LANGUAGE:
+- This website is English-only. Do NOT add any language switcher UI.
+- The entire website MUST be rendered in English only. Do not include any translation logic, i18n hooks, or language toggle components.`;
+  }
+
+  // Map ISO 639-1 codes to full language names for the prompt
+  const languageNames: Record<string, string> = {
+    pl: 'Polish',
+    de: 'German',
+    fr: 'French',
+    es: 'Spanish',
+    it: 'Italian',
+    nl: 'Dutch',
+    pt: 'Portuguese',
+    cs: 'Czech',
+    sk: 'Slovak',
+    hu: 'Hungarian',
+    ro: 'Romanian',
+    sv: 'Swedish',
+    da: 'Danish',
+    fi: 'Finnish',
+    no: 'Norwegian',
+    uk: 'Ukrainian',
+    ru: 'Russian',
+    tr: 'Turkish',
+    el: 'Greek',
+    hr: 'Croatian',
+  };
+  const nativeName = languageNames[lang] || lang.toUpperCase();
+
+  return `MANDATORY DUAL-LANGUAGE SYSTEM (${nativeName.toUpperCase()} + ENGLISH):
+- This site's native language is ${nativeName}. You MUST support exactly TWO languages: (1) ${nativeName} and (2) English.
+- SWITCHER PLACEMENT — CRITICAL: The language switcher MUST be positioned INSIDE the navbar, immediately to the right of the brand logo, before the navigation links. Treat it as part of the "logo area" unit: [Logo] [EN | ${nativeName.slice(0,2).toUpperCase()}] ... [Nav Links].
+- SWITCHER STYLE: Render it as a compact inline toggle (e.g. a pill with "PL / EN" or "EN | PL") styled with the site's design tokens — glassmorphic background, border, and accent color on the active language. Do NOT use a full dropdown unless there are 3+ languages.
+- FUNCTIONALITY: Use a React state variable (e.g. \`const [lang, setLang] = useState<'${lang}' | 'en'>('${lang}')\`) stored in React Context so ALL components react to it. Toggle with a single click — no page reload, no route change.
+- ALL CONTENT MUST BE TRANSLATED: Every string on every page (nav items, hero titles, section headings, body copy, button labels, form placeholders, footer text) MUST exist in BOTH ${nativeName} AND English. Use an inline translation dictionary or i18n hook — not hardcoded per-component.
+- DEFAULT LANGUAGE: The site MUST load in ${nativeName} by default (the native language of the original site). English is the secondary option.`;
 }

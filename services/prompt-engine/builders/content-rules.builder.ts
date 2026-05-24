@@ -57,10 +57,15 @@ ${content_analysis.weak_content_areas.map(w => `- ${w}`).join('\n')}
 NAVIGATION ISSUES TO FIX:
 ${content_analysis.navigation_issues.map(n => `- ${n}`).join('\n')}
 
-CONTENT RULES (CRITICAL):
-- NO NEW TOP-LEVEL PAGES: Strictly respect the original navigation structure.
+CONTENT RULES (CRITICAL — STRICT ZERO-HALLUCINATION ENFORCEMENT):
+- ⛔ STRICT ZERO-HALLUCINATION POLICY: Under no circumstances are you allowed to invent, simulate, or fabricate any facts, details, or assets. You MUST render ONLY authentic data found in the original crawled content.
 - 100% VERBATIM TEXT CONTENT: You MUST use the EXACT text content from the original crawled pages provided in the 'VERBATIM ORIGINAL CONTENT' section below for EVERY page. DO NOT invent, summarize, or hallucinate new text! If the original page has a paragraph, your generated page MUST have that exact same paragraph.
 - STRICT PHOTO MATCHING FOR ALL SECTIONS: Every single photo placed on the website MUST contextually match the text it is next to. If a section is about a specific service or product (e.g. "Marantz 2230" or "Wzmacniacze"), you MUST use the exact matching photo from the manifest. DO NOT randomly assign photos to unrelated topics!
+- NO FAKE PRODUCTS OR SERVICES: Do NOT invent products, prices, services, or food menu items. Render ONLY the authentic products/services found in the original crawled content.
+- NO FAKE CONTACT DETAILS: Do NOT fabricate phone numbers, physical addresses, email addresses, opening hours, or social media links. If these details are not provided in the legacy content, you MUST omit the corresponding UI fields entirely or render a clearly-labeled, empty configuration placeholder (e.g., "[Configure Phone Number]"). Never use realistic-looking mock data (such as "+48 123 456 789" or "test@example.com").
+- NO FAKE ROLES OR TEAM MEMBERS: Do NOT invent fictional team members, bios, board members, or executive roles. If there is no team page/data in the legacy content, you MUST NOT generate a simulated "Our Team" section.
+- NO FAKE TESTIMONIALS & STATS: Do NOT write fictional client reviews, simulated customer ratings, fake customer names, or invented success metrics (e.g., "10,000+ Happy Customers" or "5 Stars on Google").
+- NO NEW TOP-LEVEL PAGES: Strictly respect the original navigation structure.
 - NO E-COMMERCE CTAS: Do NOT add generic CTAs like "Zamów", "Buy Now", or "Add to Cart" unless the original site explicitly had an online ordering system. Do NOT add shopping carts.
 - HIGH CONTRAST HEADINGS: You MUST use pure white (#FFFFFF) text for all headings and links that are placed on dark backgrounds or dark navbars. Do not use dark brown or black text on dark backgrounds!
 - Every page must have a clear purpose statement in the hero.
@@ -68,7 +73,11 @@ CONTENT RULES (CRITICAL):
 
 VERBATIM ORIGINAL CONTENT TO PRESERVE (USE EXACTLY THIS TEXT FOR PAGES):
 ${pages.map(p => {
-  const text = (p.markdown_content || p.raw_json?.content || '').substring(0, 15000);
+  const fullText = p.markdown_content || p.raw_json?.content || '';
+  if (fullText.length > 25000) {
+    console.warn(`[Content Rules] Warning: Page ${p.url || p.title} content truncated from ${fullText.length} to 25000 characters.`);
+  }
+  const text = fullText.substring(0, 25000);
   return `PAGE [${p.url || p.title}]:\n${text}`;
 }).join('\n\n')}
 `.trim();

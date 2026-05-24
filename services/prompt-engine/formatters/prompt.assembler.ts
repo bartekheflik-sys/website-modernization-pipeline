@@ -10,21 +10,83 @@ import { validateAnalysisInput, validatePromptOutput, countSections, GeneratedPr
 
 import { getDesignDNA } from '../builders/design-dna.library';
 
+function buildMustIncludeElements(analysis: AIAnalysisOutput): string {
+  const elements = analysis.lovable_prompt_data?.must_include_elements || [];
+  if (elements.length === 0) return '';
+  return `
+==================================================
+J. MANDATORY SPECIFIC ELEMENTS TO INCLUDE
+==================================================
+The following specific functional or content elements MUST be built into the website exactly as described:
+${elements.map((el, i) => `${i + 1}. ${el}`).join('\n\n')}
+`.trim();
+}
+
 export function generateLovablePrompt(analysis: AIAnalysisOutput, assets: any[] = [], pages: any[] = []): GeneratedPromptOutput {
   // STEP 1: Validate that we have quality input data
   validateAnalysisInput(analysis);
 
+  // Merge any extracted navigation links from crawled pages into the pages_to_generate list
+  if (analysis.lovable_prompt_data && Array.isArray(pages)) {
+    const extractedNavLinks: string[] = [];
+    pages.forEach(p => {
+      const raw = p.raw_json;
+      if (raw && Array.isArray(raw.navigationLinks)) {
+        raw.navigationLinks.forEach((item: any) => {
+          if (item.label) {
+            if (!extractedNavLinks.some(existing => existing.toLowerCase() === item.label.toLowerCase())) {
+              extractedNavLinks.push(item.label);
+            }
+          }
+        });
+      }
+    });
+
+    const allPages = [...analysis.lovable_prompt_data.pages_to_generate];
+    extractedNavLinks.forEach(label => {
+      const navNorm = label.toLowerCase()
+        .replace(/ł/g, 'l')
+        .replace(/ó/g, 'o')
+        .replace(/ś/g, 's')
+        .replace(/ć/g, 'c')
+        .replace(/ź/g, 'z')
+        .replace(/ż/g, 'z')
+        .replace(/ń/g, 'n')
+        .replace(/ę/g, 'e')
+        .replace(/ą/g, 'a')
+        .replace(/[^a-z0-9\s]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+      const alreadyRepresented = allPages.some(page => {
+        const pageNorm = page.toLowerCase()
+          .replace(/ł/g, 'l')
+          .replace(/ó/g, 'o')
+          .replace(/ś/g, 's')
+          .replace(/ć/g, 'c')
+          .replace(/ź/g, 'z')
+          .replace(/ż/g, 'z')
+          .replace(/ń/g, 'n')
+          .replace(/ę/g, 'e')
+          .replace(/ą/g, 'a')
+          .replace(/[^a-z0-9\s]/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+        return pageNorm.includes(navNorm) || navNorm.includes(pageNorm);
+      });
+      if (!alreadyRepresented) {
+        allPages.push(label);
+      }
+    });
+    analysis.lovable_prompt_data.pages_to_generate = allPages;
+  }
+
   // DYNAMIC DESIGN INJECTION: Map the chosen Design DNA to exact style guidelines
-  if (analysis.lovable_prompt_data && analysis.lovable_prompt_data.design_dna_id) {
-    const dna = getDesignDNA(analysis.lovable_prompt_data.design_dna_id);
+  if (analysis.lovable_prompt_data) {
+    const dnaId = analysis.lovable_prompt_data.design_dna_id || 'unknown';
+    const dna = getDesignDNA(dnaId, analysis.website_type);
     analysis.design_direction.motion_level = 'high';
     analysis.lovable_prompt_data.design_style = `${dna.name}: ${dna.design_style} Base Colors: ${dna.color_direction} Typography: ${dna.typography_direction}`;
     analysis.lovable_prompt_data.animation_style = dna.animation_style;
-  } else if (analysis.lovable_prompt_data) {
-    // Fallback if AI fails to pick
-    analysis.design_direction.motion_level = 'high';
-    analysis.lovable_prompt_data.design_style = 'Premium high-end modern cinematic showcase, dark glassmorphism, responsive visual breathing room';
-    analysis.lovable_prompt_data.animation_style = 'Physics-based spring motion, scroll-linked parallax, horizontal showcases, sticky stacked decks, running marquees';
   }
 
   // STEP 2: Build each section of the prompt deterministically
@@ -32,14 +94,15 @@ export function generateLovablePrompt(analysis: AIAnalysisOutput, assets: any[] 
     buildBusinessContext(analysis),
     buildGlobalInstructions(analysis, assets),
     buildDesignSystem(analysis),
-    buildPagePlan(analysis),
+    buildPagePlan(analysis, pages),
     buildSectionSpecs(analysis),
     buildConversionRules(analysis),
     buildMotionSystem(analysis),
     buildResponsivenessRules(),
     buildContentRules(analysis, pages),
     buildAssetGuidance(analysis, assets),
-  ];
+    buildMustIncludeElements(analysis),
+  ].filter(Boolean);
 
   // STEP 3: Assemble full prompt with explicit top-level Lovable Integration Guardrails
   const fullPrompt = `
@@ -77,10 +140,20 @@ Follow the instructions below with surgical precision. Prioritize business authe
    - You MUST use the EXACT detected original page names for the main header navigation menu verbatim!
    - DO NOT invent, translate, split, or rename these items under any circumstances.
    - DO NOT put blog categories, tags, or random sections into the main top navigation!
-   - BANNED ELEMENTS: You MUST NOT add any extra pages, sections, user authentication, login flows, or bookmarks! The site MUST strictly contain only the authentic crawled pages. Banned examples: 'Login', 'Logowanie', 'Rejestracja', 'Admin', 'Dashboard', 'Cart', 'Zamów', 'Recenzje', 'Galeria', 'Pomiary'.
+   - BANNED INVENTED PAGES: You MUST NOT invent or hallucinate page names that do NOT exist in the detected pages list above.
+   - Typical examples of hallucinated pages (do NOT add these unless they are in the detected list): 'Login', 'Logowanie', 'Rejestracja', 'Admin', 'Dashboard', 'Cart', 'Zamów', 'Recenzje'.
+   - NOTE: If 'Galeria', 'Pomiary', or any other page name is listed in the detected pages above, you MUST include it — it is real.
    - You MUST render EXACTLY these names as the primary navigation bar links/routes (and absolutely nothing else):
      ${analysis.content_analysis.pages_detected.filter(p => !p.includes(' - ')).map(p => `* ${p.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`).join('\n     ')}
    - If you generate a navigation menu that does not perfectly match the list above, you have failed.
+   - TYPE GUARDRAIL (${analysis.website_type}): ${
+     analysis.website_type === 'blog' ? "Do NOT add an online store, product catalog, or booking system." :
+     analysis.website_type === 'portfolio' ? "Do NOT add a blog, a product shop, or a restaurant menu." :
+     analysis.website_type === 'restaurant' ? "Do NOT add a portfolio section, a blog feed, or software pricing tiers." :
+     analysis.website_type === 'landing_page' ? "This is a SINGLE-PAGE SITE. Do NOT split into multiple routes. Use anchor links only." :
+     analysis.website_type === 'saas' ? "Do NOT add a restaurant menu, physical location map, or art gallery." :
+     "Maintain fidelity to the original site structure."
+   }
 
 4. WCAG AA ACCESSIBILITY & HIGH CONTRAST TEXT (NO BLENDING):
    - You MUST ensure absolute legibility of all written copy. Text color MUST NOT blend into the background color!

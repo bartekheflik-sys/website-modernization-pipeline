@@ -71,7 +71,20 @@ export function buildSectionSpecs(analysis: AIAnalysisOutput): string {
         /\bcheckout\b/.test(titleLower) ||
         /\bcart\b/.test(titleLower) ||
         /\bquote\b/.test(titleLower);
-      const isServices = titleLower.includes('service') || titleLower.includes('product') || titleLower.includes('feature') || titleLower.includes('solution');
+      const isServices = 
+        titleLower.includes('service') || 
+        titleLower.includes('product') || 
+        titleLower.includes('feature') || 
+        titleLower.includes('solution') ||
+        titleLower.includes('offer') ||
+        titleLower.includes('usługa') ||
+        titleLower.includes('pricing') ||
+        titleLower.includes('package') ||
+        titleLower.includes('tier') ||
+        titleLower.includes('plan') ||
+        titleLower.includes('catalog') ||
+        titleLower.includes('portfolio item') ||
+        titleLower.includes('project');
 
       let layout = '- LAYOUT: Single column, full-width content block';
       let animation = `- ANIMATION: ${sectionAnimations}`;
@@ -82,19 +95,30 @@ export function buildSectionSpecs(analysis: AIAnalysisOutput): string {
         animation = `- ANIMATION: ${heroAnimation}`;
         // Industry-aware CTA: never use generic "Get a Quote" for non-service businesses
         const industry = (analysis.industry || '').toLowerCase();
+        const type = (analysis.website_type || 'corporate').toLowerCase();
+        
         let heroCta = 'Contact Us';
-        if (industry.includes('restaurant') || industry.includes('food') || industry.includes('pizza') || industry.includes('cafe') || industry.includes('bar')) {
+        
+        if (type === 'blog' || type === 'news' || type === 'personal') {
+          heroCta = 'Read Latest Posts';
+        } else if (type === 'portfolio') {
+          heroCta = 'View My Work';
+        } else if (type === 'ecommerce') {
+          heroCta = 'Shop Now';
+        } else if (type === 'educational') {
+          heroCta = 'Learn More';
+        } else if (type === 'landing_page') {
+          heroCta = 'Get Started Free';
+        } else if (type === 'saas') {
+          heroCta = 'Book a Demo';
+        } else if (type === 'restaurant' || industry.includes('restaurant') || industry.includes('food') || industry.includes('pizza') || industry.includes('cafe') || industry.includes('bar')) {
           heroCta = 'View Menu';
         } else if (industry.includes('gym') || industry.includes('fitness') || industry.includes('sport') || industry.includes('wellness') || industry.includes('health')) {
           heroCta = 'See Our Offer';
         } else if (industry.includes('hotel') || industry.includes('hospitality') || industry.includes('accommodation')) {
           heroCta = 'Book a Stay';
-        } else if (industry.includes('gallery') || industry.includes('art') || industry.includes('design') || industry.includes('creative') || industry.includes('agency')) {
-          heroCta = 'View Our Work';
         } else if (industry.includes('real estate') || industry.includes('property')) {
           heroCta = 'Browse Listings';
-        } else if (industry.includes('software') || industry.includes('saas') || industry.includes('tech') || industry.includes('app')) {
-          heroCta = 'Get Started';
         } else if (industry.includes('law') || industry.includes('legal') || industry.includes('consult')) {
           heroCta = 'Book a Consultation';
         }
