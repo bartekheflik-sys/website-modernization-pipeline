@@ -57,9 +57,10 @@ ${content_analysis.weak_content_areas.map(w => `- ${w}`).join('\n')}
 NAVIGATION ISSUES TO FIX:
 ${content_analysis.navigation_issues.map(n => `- ${n}`).join('\n')}
 
-CONTENT RULES:
+CONTENT RULES (CRITICAL):
 - NO NEW TOP-LEVEL PAGES: Strictly respect the original navigation structure.
-- LITERAL CONTENT PRESERVATION: Specific blocks of text such as welcome messages, contact info, and FULL MENUS MUST be preserved exactly as they appear in the source data. Do not summarize menus into categories! List every single item and price.
+- 100% VERBATIM TEXT CONTENT: You MUST use the EXACT text content from the original crawled pages provided in the 'VERBATIM ORIGINAL CONTENT' section below for EVERY page. DO NOT invent, summarize, or hallucinate new text! If the original page has a paragraph, your generated page MUST have that exact same paragraph.
+- STRICT PHOTO MATCHING FOR ALL SECTIONS: Every single photo placed on the website MUST contextually match the text it is next to. If a section is about a specific service or product (e.g. "Marantz 2230" or "Wzmacniacze"), you MUST use the exact matching photo from the manifest. DO NOT randomly assign photos to unrelated topics!
 - NO E-COMMERCE CTAS: Do NOT add generic CTAs like "Zamów", "Buy Now", or "Add to Cart" unless the original site explicitly had an online ordering system. Do NOT add shopping carts.
 - HIGH CONTRAST HEADINGS: You MUST use pure white (#FFFFFF) text for all headings and links that are placed on dark backgrounds or dark navbars. Do not use dark brown or black text on dark backgrounds!
 - Every page must have a clear purpose statement in the hero.
