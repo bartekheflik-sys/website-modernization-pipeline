@@ -143,6 +143,7 @@ HERO (every page):
 - Headline must be benefit-driven, NOT feature-driven
 - CTA: Large, high-contrast, action verb
 - ATMOSPHERIC HERO BACKGROUND: Use the imagegen tool (flux.dev, 1920x1080) to generate a stunning atmospheric background image matching the business/industry context (e.g. cozy rustic kitchen with stone fire glow for a pizzeria, sleek dark abstract gradient for SaaS, warm bright medical workspace for a clinic). Save to src/assets/hero-bg.jpg and import as an ES6 module.
+- CRITICAL HERO FALLBACK: You MUST apply a rich CSS gradient fallback on the hero container (e.g., \`bg-gradient-to-br from-primary/20 to-background\`) so the hero is NEVER blank if the image fails. 
 - Overlay a glassmorphic container on top using the glass card variant tokens: bg-[hsl(var(--surface)/0.45)] backdrop-blur-[var(--glass-blur)] border-b border-[hsl(var(--glass-border))] — this ensures the foreground text remains text-foreground at full opacity and perfect contrast.
 ${lovable_prompt_data.media_assets?.brand_images?.[0] ? `- BRAND GRAPHIC: If available, you may feature "${lovable_prompt_data.media_assets.brand_images[0]}" in a small, elegant, decorative circular frame (max-width: 180px) next to the text, but DO NOT use it as the main background, as it will look pixelated.` : ''}
 
