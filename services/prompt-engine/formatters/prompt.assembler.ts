@@ -86,12 +86,11 @@ Follow the instructions below with surgical precision. Prioritize business authe
    - For dark themes (like dark glassmorphism): Use pure white (#FFFFFF), slate-100, or high-brightness text for all headers and body copy. Never use mid-tone greys, dark slate, or low-contrast text on dark backgrounds.
    - For buttons and callouts: Ensure text placed on top of colored gradients or bright background accents has a highly contrasting color (e.g., pure black or dark navy text on yellow/cyan/green buttons, and pure white text on dark blue/purple gradients).
 
-5. ORIGINAL PHOTO RESOLUTION, RENDER SCALE & AI BACKGROUNDS:
-   - IMAGES AND PRODUCTS: You MUST preserve the original visual quality of all crawled images. NEVER stretch or scale up images beyond their native dimensions, as this causes severe pixelation. 
-   - GRID & MASONRY CLAMPING: CSS Grids and Flexbox columns often forcefully stretch images to fill large desktop screens. You MUST prevent this! Apply strict max-width constraints (e.g. \`max-w-[400px]\`, \`w-fit\`, or \`mx-auto\`) to image containers. A low-resolution photo must NEVER be blown up to fill a massive grid cell!
-   - SCALING: Render images either in their original size or smaller using clean CSS properties like \`object-fit: contain\` or \`object-scale-down\` to prevent aspect-ratio distortion and upscaling.
-   - AI BACKGROUNDS ALLOWANCE & FALLBACK: You MUST use premium, high-resolution Unsplash image URLs for full-width section backgrounds (like the Hero background). CRITICAL: Because Unsplash links can sometimes break, you MUST ALWAYS implement a rich CSS gradient fallback on the parent container (e.g., \`bg-gradient-to-br from-primary/10 via-background to-primary/5\`) so that if the image fails to load, the section does not look like empty, broken white space!
-   - AI CONTENT BAN: You MUST NOT use AI-generated or external placeholder images for specific content items like Products, Menu Items, or Galleries. Content items MUST use the authentic crawled photos.
+5. HERO BACKGROUND vs CONTENT IMAGES — STRICT SEPARATION:
+   - HERO BACKGROUND ONLY: You MUST use the imagegen tool (flux.dev, 1920x1080) to generate a stunning, atmospheric, high-resolution background image for the hero section ONLY. The image must match the business/industry type (e.g. cozy rustic stone-oven kitchen glow for a pizzeria, sleek dark abstract circuitry for a tech company, warm bright medical office for a clinic, vintage Hi-Fi amplifier workshop with warm amber lighting for electronics repair). Save it to src/assets/hero-bg.jpg and import as an ES6 module. Apply a glassmorphic overlay on top (bg-[hsl(var(--surface)/0.45)] backdrop-blur) to ensure foreground text remains readable.
+   - NEVER USE UNSPLASH URLS: Do NOT use any Unsplash links, placeholder URLs, or external image CDNs for any section — these frequently fail to load and result in broken empty sections.
+   - ALL OTHER SECTIONS (Products, Menu, Gallery, Services, Team, etc.): You MUST use ONLY the authentic original crawled photos from the Asset Manifest provided at the end of this prompt. Never use AI-generated images or stock photos for these sections.
+   - AI CONTENT BAN: You MUST NOT use AI-generated or Unsplash images for specific content items like Products, Menu Items, Blog Posts, or Galleries. Content items MUST use the authentic crawled photos from the manifest.
 
 6. MANDATORY GDPR COMPLIANCE — COOKIES BANNER & PRIVACY POLICY:
    Every website you generate MUST include the following two components. These are non-negotiable legal requirements:
