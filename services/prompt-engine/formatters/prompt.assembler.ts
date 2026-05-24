@@ -73,12 +73,14 @@ Follow the instructions below with surgical precision. Prioritize business authe
      * Staggered Spring Entrances: Spring physics (stiffness 120, damping 14) for all menu items and cards as they enter the viewport using \`whileInView\`.
    - Legibility Lock: Keep all paragraphs and body copy text 100% static for perfect reading comfort.
 
-3. STRICT NAVIGATION ARCHITECTURE & BANNED ELEMENTS:
-   - You MUST use the exact detected original page names for the main navigation menu items verbatim!
-   - DO NOT translate, change, split, or rename these items under any circumstances.
-   - BANNED ELEMENTS: You MUST NOT add any extra pages, sections, user authentication, login flows, or bookmarks! The site MUST strictly contain only the authentic crawled pages. Banned examples: 'Login', 'Logowanie', 'Rejestracja', 'Admin', 'Dashboard', 'Cart', 'Zamów'.
-   - You MUST render exactly these names as the primary navigation bar links/routes:
+3. STRICT NAVIGATION ARCHITECTURE & BANNED ELEMENTS (CRITICAL!):
+   - You MUST use the EXACT detected original page names for the main header navigation menu verbatim!
+   - DO NOT invent, translate, split, or rename these items under any circumstances.
+   - DO NOT put blog categories, tags, or random sections into the main top navigation!
+   - BANNED ELEMENTS: You MUST NOT add any extra pages, sections, user authentication, login flows, or bookmarks! The site MUST strictly contain only the authentic crawled pages. Banned examples: 'Login', 'Logowanie', 'Rejestracja', 'Admin', 'Dashboard', 'Cart', 'Zamów', 'Recenzje', 'Galeria', 'Pomiary'.
+   - You MUST render EXACTLY these names as the primary navigation bar links/routes (and absolutely nothing else):
      ${analysis.content_analysis.pages_detected.filter(p => !p.includes(' - ')).map(p => `* ${p.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`).join('\n     ')}
+   - If you generate a navigation menu that does not perfectly match the list above, you have failed.
 
 4. WCAG AA ACCESSIBILITY & HIGH CONTRAST TEXT (NO BLENDING):
    - You MUST ensure absolute legibility of all written copy. Text color MUST NOT blend into the background color!

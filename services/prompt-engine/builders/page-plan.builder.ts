@@ -116,8 +116,8 @@ PURPOSE: Display the full content of a single blog article when a user clicks an
 
 CRITICAL ROUTING REQUIREMENTS:
 - You MUST implement a dynamic detail route: /blog/:slug (React Router) or /blog/[slug] (Next.js).
-- Every single blog card on the blog listing page MUST be wrapped in a clickable <Link to="/blog/post-slug"> or <a href="/blog/post-slug"> that navigates to this page.
-- A blog listing page with cards that are NOT clickable is considered a CRITICAL BUILD FAILURE.
+- BUTTON CLICKABILITY: The "Czytaj dalej" (Read more) button on every blog card MUST be fully functional! Wrap the button (or the entire card) properly using <Link to="/blog/post-slug">. Do NOT use an empty href="#" or a dead <button>.
+- A blog listing page with cards or "Czytaj dalej" buttons that do NOT navigate to the article is considered a CRITICAL BUILD FAILURE.
 - Store blog posts as a typed array of objects (id, slug, title, category, date, readTime, image, content, tags).
 
 REQUIRED SECTIONS (IN ORDER):
