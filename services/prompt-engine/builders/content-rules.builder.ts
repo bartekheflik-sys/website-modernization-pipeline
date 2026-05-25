@@ -73,15 +73,15 @@ CONTENT RULES (CRITICAL — STRICT ZERO-HALLUCINATION ENFORCEMENT):
 
 VERBATIM ORIGINAL CONTENT TO PRESERVE (USE EXACTLY THIS TEXT FOR PAGES):
 ${pages.map(p => {
-  const fullText = p.markdown_content || p.raw_json?.content || '';
-  // Increased limit to 80,000 chars — long technical/blog articles must NOT be truncated mid-sentence
-  const CONTENT_LIMIT = 80000;
-  if (fullText.length > CONTENT_LIMIT) {
-    console.warn(`[Content Rules] Warning: Page ${p.url || p.title} content truncated from ${fullText.length} to ${CONTENT_LIMIT} characters.`);
-  }
-  const text = fullText.substring(0, CONTENT_LIMIT);
-  return `PAGE [${p.url || p.title}]:\n${text}`;
-}).join('\n\n')}
+    const fullText = p.markdown_content || p.raw_json?.content || '';
+    // Increased limit to 80,000 chars — long technical/blog articles must NOT be truncated mid-sentence
+    const CONTENT_LIMIT = 80000;
+    if (fullText.length > CONTENT_LIMIT) {
+      console.warn(`[Content Rules] Warning: Page ${p.url || p.title} content truncated from ${fullText.length} to ${CONTENT_LIMIT} characters.`);
+    }
+    const text = fullText.substring(0, CONTENT_LIMIT);
+    return `PAGE [${p.url || p.title}]:\n${text}`;
+  }).join('\n\n')}
 `.trim();
 }
 
