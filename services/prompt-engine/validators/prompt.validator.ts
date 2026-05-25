@@ -87,7 +87,22 @@ export function countSections(analysis: AIAnalysisOutput): number {
   const allPages = analysis.lovable_prompt_data.sections_per_page;
   
   // Apply same normalization as page-plan.builder to get accurate count
-  const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+  const normalize = (s: string) => s.toLowerCase()
+    .replace(/_/g, ' ')
+    .replace(/-/g, ' ')
+    .replace(/\//g, ' ')
+    .replace(/ł/g, 'l')
+    .replace(/ó/g, 'o')
+    .replace(/ś/g, 's')
+    .replace(/ć/g, 'c')
+    .replace(/ź/g, 'z')
+    .replace(/ż/g, 'z')
+    .replace(/ń/g, 'n')
+    .replace(/ę/g, 'e')
+    .replace(/ą/g, 'a')
+    .replace(/[^a-z0-9\s]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
   const aliasMap: Record<string, string[]> = {
     home: ['strona', 'homepage', 'glowna', 'main'],
     menu: ['menu'],

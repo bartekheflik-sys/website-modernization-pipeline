@@ -52,7 +52,8 @@ export async function POST(request: Request) {
     // Log Success
     await logPipelineStep(projectId, 'prompt_generation', 'success', `Successfully generated prompt with ${result.result?.metadata.pages.length} pages.`);
     await transitionProjectState(projectId, 'prompt_completed');
-    await transitionProjectState(projectId, 'completed');
+    // NOTE: Do NOT auto-transition to 'completed' here — the pipeline continues
+    // through lovable_generating → qa_running. Dashboard triggers next step.
 
     const response = NextResponse.json(result, { status: 200 });
     response.headers.set('Access-Control-Allow-Origin', '*');

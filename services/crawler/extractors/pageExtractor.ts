@@ -2,7 +2,10 @@ import * as cheerio from 'cheerio';
 import TurndownService from 'turndown';
 
 const turndownService = new TurndownService({ headingStyle: 'atx' });
-turndownService.remove(['script', 'style', 'noscript', 'iframe', 'nav', 'footer', 'header']);
+// IMPORTANT: Do NOT remove 'header' or 'footer' here — Blogger wraps article section
+// headings and content inside <header> elements. Removing them strips real content.
+// Page-level chrome (nav, sidebar, etc.) is already removed by cheerio above.
+turndownService.remove(['script', 'style', 'noscript', 'iframe']);
 
 export interface ExtractedAsset {
   url: string;
@@ -151,10 +154,39 @@ export function extractPageData(html: string, url: string): ExtractedPageData {
     }
   });
 
-  // Extract main content by removing boilerplate
-  // Note: navigation links are already extracted above before this removal
-  $('nav, footer, header, script, style, noscript, aside, .sidebar, #sidebar').remove();
-  const mainHtml = $('main').length ? $('main').html() : $('body').html();
+  // Extract main content by removing ONLY page chrome boilerplate.
+  // CRITICAL: Do NOT remove <header> globally — article/post headers contain section titles.
+  // Instead, remove specific page-level chrome selectors only.
+  $('nav, footer, script, style, noscript').remove();
+  $('aside, .sidebar, #sidebar, #sidebar_right, #sidebar_left').remove();
+  // Remove Blogger-specific chrome that is NOT article content
+  $('.navbar, #navbar, .blog-pager, .post-feeds, .feed-links, .comment-form, #comments').remove();
+  $('.widget.Profile, .widget.BlogArchive, .widget.HTML, .widget.PageList').remove();
+
+  // Try to extract only the post/article body first (most content-rich selector)
+  // Blogger wraps post content in .post-body or .entry-content inside article/.post
+  const postBodySelectors = [
+    'article .post-body',
+    'article .entry-content',
+    '.post-body',
+    '.entry-content',
+    'article',
+    'main',
+    '.post',
+    '[itemprop="articleBody"]'
+  ];
+
+  let mainHtml: string | null = null;
+  for (const sel of postBodySelectors) {
+    const el = $(sel);
+    if (el.length && (el.text()?.trim().length ?? 0) > 100) {
+      mainHtml = el.html();
+      break;
+    }
+  }
+  // Ultimate fallback: entire body
+  if (!mainHtml) mainHtml = $('body').html();
+
   const content = mainHtml ? turndownService.turndown(mainHtml) : '';
 
   return {

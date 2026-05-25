@@ -148,7 +148,7 @@ REQUIRED JSON STRUCTURE:
     "sections_per_page": [
       { "page_name": "string", "sections": ["string"] }
     ],
-    "design_dna_id": "one of: dna_synthesis | dna_balmoral | dna_allia | dna_fauna | dna_lesse | dna_ozgur | dna_sondaven",
+    "design_dna_id": "one of: dna_synthesis | dna_balmoral | dna_allia | dna_fauna | dna_lesse | dna_ozgur | dna_sondaven | dna_chronicle | dna_launchpad",
     "design_style": "string",
     "animation_style": "string",
     "conversion_goals": ["string"],
@@ -205,23 +205,27 @@ REQUIRED JSON STRUCTURE:
 
 
 
-        // Build a blog post manifest: title → og:image URL (from raw_json.featuredImage)
-        // This prevents AI from assigning the author profile photo to blog cards
+      }
+      
+      // Generic Blog Post Manifest Builder
+      // This ensures all blog/personal sites get their posts mapped properly
+      if ((json.website_type === 'blog' || json.website_type === 'personal') && json.lovable_prompt_data) {
         const blogPostManifest = pages
           .filter((p: any) => {
             const u = (p.url || '').toLowerCase();
-            // Individual blog posts have year/month in URL, not the static pages
-            return u.includes('impedancja.blogspot.com/20') && !u.includes('/p/');
+            const isStatic = u.endsWith('/about') || u.endsWith('/contact') || u.match(/\/p\/[^\/]+\.html$/);
+            // Relax image requirement: allow if URL looks like a blog post (e.g. contains year) OR has media
+            const hasDateInUrl = /\/20\d\d\/\d\d\//.test(u);
+            return !isStatic && (hasDateInUrl || p.raw_json?.featuredImage || p.raw_json?.assets?.length > 0);
           })
           .map((p: any) => ({
             title: p.title || p.raw_json?.title || '',
             url: p.url || p.raw_json?.url || '',
-            featuredImage: p.raw_json?.featuredImage || p.raw_json?.assets?.[0]?.url || '',
+            featuredImage: p.raw_json?.featuredImage || p.raw_json?.assets?.[0]?.url || 'https://images.weserv.nl/?url=placeholder.com/150&text=No+Image',
           }))
-          .filter((post: any) => post.title && post.featuredImage);
+          .filter((post: any) => post.title);
 
         if (blogPostManifest.length > 0) {
-          // Inject manifest into must_include_elements so it reaches the prompt
           json.lovable_prompt_data.must_include_elements = [
             ...(json.lovable_prompt_data.must_include_elements || []),
             `BLOG POST IMAGE MANIFEST (MANDATORY — use these EXACT URLs for blog cards, NO substitution): ${JSON.stringify(blogPostManifest)}`

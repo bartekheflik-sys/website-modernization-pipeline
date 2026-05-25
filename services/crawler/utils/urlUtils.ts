@@ -2,7 +2,20 @@ export function normalizeUrl(url: string): string {
   try {
     const u = new URL(url);
     // Remove hash and trailing slash to prevent treating example.com/ and example.com/# as different pages
-    return u.origin + u.pathname.replace(/\/$/, '') + u.search;
+    const pathname = u.pathname.replace(/\/$/, '');
+    
+    // Clean search params to avoid duplicate mobile/desktop or tracking page variants
+    const params = new URLSearchParams(u.search);
+    params.delete('m');
+    params.delete('utm_source');
+    params.delete('utm_medium');
+    params.delete('utm_campaign');
+    params.delete('utm_term');
+    params.delete('utm_content');
+    params.delete('fbclid');
+    
+    const searchStr = params.toString();
+    return u.origin + pathname + (searchStr ? `?${searchStr}` : '');
   } catch {
     return url;
   }

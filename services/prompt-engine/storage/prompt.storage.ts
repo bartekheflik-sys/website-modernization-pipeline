@@ -3,6 +3,11 @@ import * as dotenv from 'dotenv';
 import path from 'path';
 import { GeneratedPromptOutput } from '../validators/prompt.validator';
 
+dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../../.env.local') });
+dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../../../.env.local') });
+dotenv.config({ path: path.resolve(__dirname, '../../../apps/api/.env.local') });
 dotenv.config({ path: path.resolve(__dirname, '../../../../apps/api/.env.local') });
 
 const supabase = createClient(

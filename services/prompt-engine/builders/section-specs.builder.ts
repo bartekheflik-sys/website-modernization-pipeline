@@ -1,7 +1,22 @@
 import { AIAnalysisOutput } from '../schemas/analysis.schema';
 
 function normalize(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+  return s.toLowerCase()
+    .replace(/_/g, ' ')
+    .replace(/-/g, ' ')
+    .replace(/\//g, ' ')
+    .replace(/ł/g, 'l')
+    .replace(/ó/g, 'o')
+    .replace(/ś/g, 's')
+    .replace(/ć/g, 'c')
+    .replace(/ź/g, 'z')
+    .replace(/ż/g, 'z')
+    .replace(/ń/g, 'n')
+    .replace(/ę/g, 'e')
+    .replace(/ą/g, 'a')
+    .replace(/[^a-z0-9\s]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function hasDetectedMatch(pageName: string, detectedPages: string[]): boolean {
@@ -50,7 +65,12 @@ export function buildSectionSpecs(analysis: AIAnalysisOutput): string {
 
   // Build page-specific section specs grounded in Step 3 data
   const pageSectionBlocks = pages.map(page => {
-    const pageSections = sectionsMap[page] || [];
+    // Fuzzy sections lookup: exact match first, then normalized fallback
+    const sectionsExact = sectionsMap[page];
+    const sectionsNorm = !sectionsExact
+      ? Object.entries(sectionsMap).find(([key]) => normalize(key) === normalize(page))?.[1]
+      : undefined;
+    const pageSections = sectionsExact || sectionsNorm || [];
     if (pageSections.length === 0) return '';
 
     const sectionSpecs = pageSections.map((sectionTitle, i) => {
@@ -96,31 +116,32 @@ export function buildSectionSpecs(analysis: AIAnalysisOutput): string {
         // Industry-aware CTA: never use generic "Get a Quote" for non-service businesses
         const industry = (analysis.industry || '').toLowerCase();
         const type = (analysis.website_type || 'corporate').toLowerCase();
+        const isPl = (analysis.detected_language || '').toLowerCase() === 'pl';
         
-        let heroCta = 'Contact Us';
+        let heroCta = isPl ? 'Skontaktuj się z nami' : 'Contact Us';
         
         if (type === 'blog' || type === 'news' || type === 'personal') {
-          heroCta = 'Read Latest Posts';
+          heroCta = isPl ? 'Czytaj najnowsze posty' : 'Read Latest Posts';
         } else if (type === 'portfolio') {
-          heroCta = 'View My Work';
+          heroCta = isPl ? 'Zobacz moje projekty' : 'View My Work';
         } else if (type === 'ecommerce') {
-          heroCta = 'Shop Now';
+          heroCta = isPl ? 'Kup teraz' : 'Shop Now';
         } else if (type === 'educational') {
-          heroCta = 'Learn More';
+          heroCta = isPl ? 'Dowiedz się więcej' : 'Learn More';
         } else if (type === 'landing_page') {
-          heroCta = 'Get Started Free';
+          heroCta = isPl ? 'Zacznij za darmo' : 'Get Started Free';
         } else if (type === 'saas') {
-          heroCta = 'Book a Demo';
+          heroCta = isPl ? 'Zamów demo' : 'Book a Demo';
         } else if (type === 'restaurant' || industry.includes('restaurant') || industry.includes('food') || industry.includes('pizza') || industry.includes('cafe') || industry.includes('bar')) {
-          heroCta = 'View Menu';
+          heroCta = isPl ? 'Zobacz menu' : 'View Menu';
         } else if (industry.includes('gym') || industry.includes('fitness') || industry.includes('sport') || industry.includes('wellness') || industry.includes('health')) {
-          heroCta = 'See Our Offer';
+          heroCta = isPl ? 'Zobacz ofertę' : 'See Our Offer';
         } else if (industry.includes('hotel') || industry.includes('hospitality') || industry.includes('accommodation')) {
-          heroCta = 'Book a Stay';
+          heroCta = isPl ? 'Zarezerwuj pobyt' : 'Book a Stay';
         } else if (industry.includes('real estate') || industry.includes('property')) {
-          heroCta = 'Browse Listings';
+          heroCta = isPl ? 'Przeglądaj ogłoszenia' : 'Browse Listings';
         } else if (industry.includes('law') || industry.includes('legal') || industry.includes('consult')) {
-          heroCta = 'Book a Consultation';
+          heroCta = isPl ? 'Umów konsultację' : 'Book a Consultation';
         }
         extra = `- HEADLINE: Benefit-driven — derived from: "${valuePropositionSnippet}..."\n   - CTA BUTTON: High-contrast primary color, action verb: "${heroCta}"`;
       } else if (isServices) {
@@ -155,9 +176,11 @@ ${!lovable_prompt_data.media_assets?.product_images?.length && !lovable_prompt_d
 
 UNIVERSAL SECTION RULES:
 - Use original LOGO URL in Footer and Navigation.
+- NAVBAR LANGUAGE SWITCHER: If the site requires dual-language support, you MUST build a Language Switcher (e.g. EN | PL) inside the Navbar. Do NOT forget the language switcher.
 - Prioritize using ORIGINAL PRODUCT PHOTOS from the list above in the Services and Product sections.
 - If an image from the list matches a service/product by context, use it.
 - THUMBNAIL PRESERVATION RULE FOR ALL LEGACY ASSETS: All original media assets (like product photos, menu photos, case studies, or gallery pictures from the legacy crawled website) are highly compressed and low-resolution. To keep them crisp and professional, you MUST NOT stretch them, scale them up, or use them in large full-width elements, massive hero layouts, or full-width cards! Instead, keep them strictly as elegant, small thumbnails (max-width: 100px - 150px) such as rounded avatar circles, small square thumbnails on lists, or decorative floating badges next to detailed typography—exactly as they were in the original layout! This ensures they look extremely sharp and high-quality, rather than blurred or pixelated.
+- MANDATORY DATA VISUALIZATION: For any "ranking", "points", "scores", or "metrics" data, you MUST implement visually engaging data visualizations such as colorful progress bars, dynamic score badges (gold/silver/bronze), or color-coded tiers. Do NOT simply output raw numbers for points.
 
 STANDARD SECTION TEMPLATES:
 

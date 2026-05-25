@@ -6,6 +6,9 @@ import { AIAnalysisOutput } from '../schemas/analysis.schema';
  */
 function normalize(s: string): string {
   return s.toLowerCase()
+    .replace(/_/g, ' ')
+    .replace(/-/g, ' ')
+    .replace(/\//g, ' ')
     .replace(/ł/g, 'l')
     .replace(/ó/g, 'o')
     .replace(/ś/g, 's')
@@ -81,29 +84,37 @@ export function buildPagePlan(analysis: AIAnalysisOutput, crawledPages: any[] = 
   const hasEducational = type === 'educational';
 
   const pageBlocks = pages.map((page, index) => {
-    const pageSections = sections[page] || [];
+    // Fuzzy sections lookup: exact match first, then normalized fallback
+    const sectionsExact = sections[page];
+    const sectionsNorm = !sectionsExact
+      ? Object.entries(sections).find(([key]) => normalize(key) === normalize(page))?.[1]
+      : undefined;
+    const pageSections = sectionsExact || sectionsNorm || [];
     const isHome = index === 0;
 
     // Strip AI-invented percentage metrics from conversion goals (e.g. "by 40%", "by 20%")
     const rawGoal = lovable_prompt_data.conversion_goals[index % lovable_prompt_data.conversion_goals.length] || 'Drive contact form submissions';
     const conversionGoal = rawGoal.replace(/\s+by\s+\d+%/gi, '').replace(/\s{2,}/g, ' ').trim();
 
+    // Inject a strict global navbar requirement for every page
+    const globalNavbarSection = `   0. [GLOBAL NAVBAR] — Render the primary navigation bar. You MUST include a Language Switcher (e.g. EN | PL) here if dual-language is active.\n`;
+
     // For non-home pages, prepend a dedicated Page Header hero so content sections
     // (like "Location Map & Address" or "Food Photography Showcase") never become the hero.
     const nonHomeHeroSection = !isHome
-      ? `   0. [PAGE HEADER] — Full-width compact hero introducing the ${page} page (H1: page title, subheadline: one-line purpose, optional CTA)\n`
+      ? `   1. [PAGE HEADER] — Full-width compact hero introducing the ${page} page (H1: page title, subheadline: one-line purpose, optional CTA)\n`
       : '';
 
     // Inject type-aware home page sections
     let homeTypeSection = '';
     if (isHome) {
       if (hasBlog) {
-        homeTypeSection = `\n   [MANDATORY — LATEST POSTS PREVIEW]: Render a "Najnowsze posty" / "Latest Posts" blog feed section on the home page.\n` +
-          `   HARDCODED DATA ARRAY REQUIRED: You MUST create a hardcoded \`blogPosts\` array using the titles and slugs from the BLOG POST IMAGE MANIFEST so the cards map to real posts.\n` +
-          `   Show the 3 most recent blog post cards in a responsive grid (1-col mobile, 2-col tablet, 3-col desktop).\n` +
-          `   Each card MUST contain: title (H3), publish date, 2-sentence excerpt, featuredImage thumbnail (max 200px width, rounded, object-fit cover), and a "Czytaj dalej →" / "Read More →" link.\n` +
-          `   ⛔ Card images MUST use the exact featuredImage URL from the BLOG POST IMAGE MANIFEST — NOT the author profile photo.\n` +
-          `   ⛔ Each "Czytaj dalej" link MUST be a React Router <Link to={\`/blog/\${post.slug}\`}> — NEVER an external link, NEVER href="#".\n` +
+        homeTypeSection = `\n   [MANDATORY — LATEST POSTS PREVIEW]: Render a "Latest Posts" blog feed section on the home page.\n` +
+          `   HARDCODED DATA ARRAY REQUIRED: You MUST create a hardcoded \`blogPosts\` array using the titles and slugs from the BLOG POST IMAGE MANIFEST (if provided), otherwise extract authentic posts strictly from the raw crawled content. NEVER INVENT BLOG POSTS.\n` +
+          `   Show ALL authentic blog post cards found in a responsive grid (1-col mobile, 2-col tablet, 3-col desktop). Do NOT limit to 3 or 5 posts, display all of them.\n` +
+          `   Each card MUST contain: title (H3), publish date, 2-sentence excerpt, featuredImage thumbnail (max 200px width, rounded, object-fit cover), and a "Read More" link (translated to the appropriate language).\n` +
+          `   ⛔ Card images MUST use the exact featuredImage URL from the BLOG POST IMAGE MANIFEST or the crawled data — NOT the author profile photo. Do not generate fake images.\n` +
+          `   ⛔ Each "Read More" link MUST be a React Router <Link to={\`/blog/\${post.slug}\`}> — NEVER an external link, NEVER href="#".\n` +
           `   Cards must have hover lift animation (translateY -4px, shadow-card-hover) and smooth transition (0.25s ease-out).`;
       } else if (hasPortfolio) {
         homeTypeSection = `\n   [MANDATORY — FEATURED WORK]: A stunning masonry grid or horizontal scroll showcase of the 4 best portfolio pieces. Use original project thumbnails. Hover states must reveal the project title. Add a "View All Projects" CTA linking to /portfolio.`;
@@ -123,7 +134,7 @@ export function buildPagePlan(analysis: AIAnalysisOutput, crawledPages: any[] = 
 PURPOSE: ${isHome ? 'Primary landing page. Communicate value proposition above the fold and drive primary conversion action.' : `Detail page for ${page}. Answer specific user intent and provide clear next steps.`}
 LAYOUT: ${isHome && hasLandingPage ? 'Single long-scroll page with anchor navigation' : isHome ? 'Full-width hero → Service grid → Trust signals → CTA banner → Footer' : 'Compact page hero → Content sections → Internal CTA → Contact block → Footer'}
 REQUIRED SECTIONS (IN ORDER):
-${nonHomeHeroSection}${sectionList || '   1. Content\n   2. CTA'}${homeTypeSection}
+${globalNavbarSection}${nonHomeHeroSection}${sectionList || '   1. Content\n   2. CTA'}${homeTypeSection}
 CTA PLACEMENT: ${isHome ? 'Primary CTA in hero (above fold) + after services section + final CTA banner before footer' : 'Subtle CTA at top + primary CTA at bottom of content'}
 CONVERSION INTENT: ${conversionGoal}
 VISUAL HIERARCHY: H1 (most prominent) → H2 (section titles) → body (comfortable reading) → CTAs (high-contrast, unmissable)`.trim();
@@ -137,9 +148,9 @@ VISUAL HIERARCHY: H1 (most prominent) → H2 (section titles) → body (comforta
 CRITICAL ROUTING REQUIREMENTS:
 - You MUST implement a dynamic detail route: \`/blog/:slug\` (React Router) or \`/blog/[slug]\` (Next.js).
 - INTERNAL SUBPAGE ONLY (NO EXTERNAL LINKS): The blog posts MUST open as internal subpages on the website.
-- HARDCODED DATA ARRAY REQUIRED: To make the "Czytaj dalej" link work, you MUST create a hardcoded \`blogPosts\` array in your code containing the titles, slugs, and featuredImage URLs extracted from the BLOG POST IMAGE MANIFEST. 
-- BUTTON CLICKABILITY: The "Czytaj dalej" (Read more) button on every blog card MUST be fully functional! Wrap it properly using the React Router \`<Link to={\`/blog/\${post.slug}\`}>\`. Do NOT use empty \`href="#"\` or dead \`<button>\`.
-- STRICT ROUTING GUARDRAIL: Do NOT link the "Czytaj dalej" button to unrelated pages. It MUST link strictly to the dynamic route using the post's unique slug.
+- HARDCODED DATA ARRAY REQUIRED: To make the "Read More" link work, you MUST create a hardcoded \`blogPosts\` array in your code containing the titles, slugs, and featuredImage URLs extracted from the BLOG POST IMAGE MANIFEST (if provided), or exactly from the crawled content. ZERO HALLUCINATION. Do NOT invent posts. 
+- BUTTON CLICKABILITY: The "Read More" button on every blog card MUST be fully functional! Wrap it properly using the React Router \`<Link to={\`/blog/\${post.slug}\`}>\`. Do NOT use empty \`href="#"\` or dead \`<button>\`.
+- STRICT ROUTING GUARDRAIL: Do NOT link the "Read More" button to unrelated pages. It MUST link strictly to the dynamic route using the post's unique slug.
 
 REQUIRED SECTIONS (IN ORDER):
    1. [BACK NAVIGATION] — "← Back to Blog" link top-left, styled subtly with hover underline

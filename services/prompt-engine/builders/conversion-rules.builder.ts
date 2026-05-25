@@ -29,6 +29,7 @@ CTA STRATEGY:
 - Use action-oriented verbs that are APPROPRIATE FOR THE INDUSTRY — e.g. "View Menu" for restaurants, "Book a Stay" for hotels, "Get Started" for SaaS. Never use passive text like "Click Here" or "Submit"
 - Never add online ordering, cart, or payment CTAs unless the original site had these features
 - Include a SECONDARY CTA (lower commitment) near the primary: e.g. "See Our Work" next to "Contact Us"
+- FUNCTIONAL CONTACT CTAs: Service-oriented CTAs (like "Request Service", "Book a Repair", or "Contact Us") MUST NOT be dead/empty buttons. They MUST either open a Modal containing Contact Information (Phone, Email, Address) or seamlessly scroll to the Contact Form section.
 
 TRUST-BUILDING PLACEMENT:
 - Place trust signals (client count, years of experience, certifications) directly below the hero

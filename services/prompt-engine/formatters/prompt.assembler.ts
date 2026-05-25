@@ -145,15 +145,20 @@ Follow the instructions below with surgical precision. Prioritize business authe
    - NOTE: If 'Galeria', 'Pomiary', or any other page name is listed in the detected pages above, you MUST include it — it is real.
    - You MUST render EXACTLY these names as the primary navigation bar links/routes (and absolutely nothing else):
      ${analysis.content_analysis.pages_detected.filter(p => !p.includes(' - ')).map(p => `* ${p.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`).join('\n     ')}
-   - REAL ROUTING REQUIRED: Each navigation item MUST be a real React Router \`<Link to="/path">\` that navigates to a dedicated separate page (unless it is a landing_page). Do NOT use empty \`href="#"\`, dead buttons, or scrolling anchor links for multi-page sites!
-   - FULL PAGE CONTENT: For EVERY navigation link, you MUST build a full, separate React component/route that displays the VERBATIM original content for that page. Do NOT leave subpages empty.
+   - REAL ROUTING REQUIRED: ${analysis.website_type === 'landing_page' ? 'This is a LANDING PAGE. Use anchor-link navigation ONLY (href="#section-id"). Do NOT create separate routes for any nav item.' : 'Each navigation item MUST be a real React Router "<Link to="/path">" that navigates to a dedicated separate page. Do NOT use empty href="#" , dead buttons, or anchor links.'}
+   - NO ANCHOR LINKS OR SCROLL-TO-TOP FOR CARDS/TABS: Clicking a blog post card (e.g., "Czytaj dalej" / "Read More"), service card, product card, or menu item MUST navigate to its dynamic subpage route (e.g., /blog/:slug, /services/:slug, /menu/:id) using React Router "<Link>". Do NOT use href="#" or scroll to sections (like #hero or #top) for these cards! This is why clicking "Najnowsze posty" or "Czytaj dalej" was failing or jumping back to the hero section. Correct this immediately.
+   - FULL PAGE CONTENT: ${analysis.website_type === 'landing_page' ? 'All content must live on one scrolling page, split into sections with matching id attributes.' : 'For EVERY navigation link, you MUST build a full, separate React component/route with the VERBATIM original content. Do NOT leave subpages empty.'}
    - TYPE GUARDRAIL (${analysis.website_type}): ${
-     analysis.website_type === 'blog' ? "Do NOT add an online store, product catalog, or booking system." :
-     analysis.website_type === 'portfolio' ? "Do NOT add a blog, a product shop, or a restaurant menu." :
-     analysis.website_type === 'restaurant' ? "Do NOT add a portfolio section, a blog feed, or software pricing tiers." :
-     analysis.website_type === 'landing_page' ? "This is a SINGLE-PAGE SITE. Do NOT split into multiple routes. Use anchor links only." :
-     analysis.website_type === 'saas' ? "Do NOT add a restaurant menu, physical location map, or art gallery." :
-     "Maintain fidelity to the original site structure."
+     analysis.website_type === 'blog' ? 'Do NOT add an online store, product catalog, or booking system.' :
+     analysis.website_type === 'personal' ? 'Do NOT add an online store or booking system.' :
+     analysis.website_type === 'portfolio' ? 'Do NOT add a blog feed, a product shop, or a restaurant menu.' :
+     analysis.website_type === 'restaurant' ? 'Do NOT add a portfolio section, a blog feed, or software pricing tiers.' :
+     analysis.website_type === 'landing_page' ? 'Single-page only. No multi-route navigation.' :
+     analysis.website_type === 'saas' ? 'Do NOT add a restaurant menu, physical location map, or art gallery.' :
+     analysis.website_type === 'ecommerce' ? 'Include product detail pages. Do NOT fabricate products not in the crawled data.' :
+     analysis.website_type === 'news' ? 'All articles must route to /article/:slug. Do NOT invent articles.' :
+     analysis.website_type === 'educational' ? 'All courses must route to /course/:slug. Do NOT invent courses.' :
+     'Maintain fidelity to the original site structure.'
    }
 
 4. WCAG AA ACCESSIBILITY & HIGH CONTRAST TEXT (NO BLENDING):

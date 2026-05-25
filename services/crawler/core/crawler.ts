@@ -80,11 +80,15 @@ export class WebCrawler {
       // Basic rate limiting/politeness delay between requests
       await new Promise(r => setTimeout(r, 500));
 
-      const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
+      // Use 'load' (not 'domcontentloaded') so Blogger's lazy-loaded images and
+      // JS-rendered content are fully present in the DOM before we extract.
+      const response = await page.goto(url, { waitUntil: 'load', timeout: 20000 });
       if (!response || !response.ok()) {
         console.warn(`[Crawler] Failed or Redirected ${url}: ${response?.status()}`);
         return;
       }
+      // Extra wait for any remaining JS-injected content (e.g. Blogger widgets)
+      await page.waitForTimeout(800);
 
       const html = await page.content();
       const extractedData = extractPageData(html, url);
