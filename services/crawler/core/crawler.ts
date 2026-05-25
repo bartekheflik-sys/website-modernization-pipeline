@@ -80,13 +80,25 @@ export class WebCrawler {
       // Basic rate limiting/politeness delay between requests
       await new Promise(r => setTimeout(r, 500));
 
-      // Use 'load' (not 'domcontentloaded') so Blogger's lazy-loaded images and
-      // JS-rendered content are fully present in the DOM before we extract.
-      const response = await page.goto(url, { waitUntil: 'load', timeout: 20000 });
+      let response;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          // Use 'load' (not 'domcontentloaded') so Blogger's lazy-loaded images and
+          // JS-rendered content are fully present in the DOM before we extract.
+          response = await page.goto(url, { waitUntil: 'load', timeout: 20000 });
+          if (response && response.ok()) break; // Success
+        } catch (error) {
+          if (attempt === 3) throw error;
+          console.warn(`[Crawler] Attempt ${attempt} failed for ${url}. Retrying...`);
+          await new Promise(r => setTimeout(r, 1000 * attempt)); // Exponential-ish backoff
+        }
+      }
+
       if (!response || !response.ok()) {
         console.warn(`[Crawler] Failed or Redirected ${url}: ${response?.status()}`);
         return;
       }
+      
       // Extra wait for any remaining JS-injected content (e.g. Blogger widgets)
       await page.waitForTimeout(800);
 
@@ -99,13 +111,15 @@ export class WebCrawler {
           if (asset.type === 'image') {
             const img = document.querySelector(`img[src="${asset.url}"]`) as HTMLImageElement;
             if (img) {
-              return {
-                ...asset,
-                dimensions: {
-                  width: img.naturalWidth || img.width,
-                  height: img.naturalHeight || img.height
-                }
-              };
+              const width = img.naturalWidth || img.width;
+              const height = img.naturalHeight || img.height;
+              // If dimensions are 0 (lazy-loading not triggered), omit them rather than returning invalid 0x0
+              if (width > 0 && height > 0) {
+                return {
+                  ...asset,
+                  dimensions: { width, height }
+                };
+              }
             }
           }
           return asset;

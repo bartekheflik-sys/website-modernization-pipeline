@@ -72,16 +72,34 @@ CONTENT RULES (CRITICAL — STRICT ZERO-HALLUCINATION ENFORCEMENT):
 - All body text must be max 3 sentences per paragraph (scannable).
 
 VERBATIM ORIGINAL CONTENT TO PRESERVE (USE EXACTLY THIS TEXT FOR PAGES):
-${pages.map(p => {
+${(() => {
+  const MAX_TOTAL_CHARS = 600000; // Overall Lovable prompt limit buffer
+  let currentTotal = 0;
+  
+  return pages.map(p => {
     const fullText = p.markdown_content || p.raw_json?.content || '';
+    
     // Increased limit to 80,000 chars — long technical/blog articles must NOT be truncated mid-sentence
     const CONTENT_LIMIT = 80000;
-    if (fullText.length > CONTENT_LIMIT) {
-      console.warn(`[Content Rules] Warning: Page ${p.url || p.title} content truncated from ${fullText.length} to ${CONTENT_LIMIT} characters.`);
+    
+    // Determine how many characters we can afford to include
+    const allowedLength = Math.min(CONTENT_LIMIT, MAX_TOTAL_CHARS - currentTotal);
+    
+    if (allowedLength <= 0) {
+      console.warn(`[Content Rules] Warning: Context limit reached. Skipping verbatim content for ${p.url || p.title}.`);
+      return ''; 
     }
-    const text = fullText.substring(0, CONTENT_LIMIT);
+
+    if (fullText.length > allowedLength) {
+      console.warn(`[Content Rules] Warning: Page ${p.url || p.title} content truncated from ${fullText.length} to ${allowedLength} characters.`);
+    }
+    
+    const text = fullText.substring(0, allowedLength);
+    currentTotal += text.length;
+    
     return `PAGE [${p.url || p.title}]:\n${text}`;
-  }).join('\n\n')}
+  }).filter(Boolean).join('\n\n');
+})()}
 `.trim();
 }
 
