@@ -166,7 +166,7 @@ REQUIRED JSON STRUCTURE:
 
   const prompt = `${systemPrompt}\n\nDATA TO ANALYZE:\n${compressedData.unifiedMarkdown}`;
 
-  const attempts = 3;
+  const attempts = 5;
   for (let i = 0; i < attempts; i++) {
     try {
       console.log(`[Analyzer] Attempt ${i + 1}/${attempts}: Generating Structured Analysis...`);
@@ -314,10 +314,17 @@ REQUIRED JSON STRUCTURE:
       console.error(`[Analyzer] Attempt ${i + 1} failed:`, error.message);
       if (i === attempts - 1) throw error;
       
-      let backoffDelay = 5000;
-      if (error.message?.includes('429') || error.message?.toLowerCase().includes('quota') || error.message?.toLowerCase().includes('rate limit')) {
+      let backoffDelay = 5000 * (i + 1); // Default exponential backoff (5s, 10s, 15s, 20s)
+      
+      const errorMessage = error.message?.toLowerCase() || '';
+      
+      if (errorMessage.includes('429') || errorMessage.includes('quota') || errorMessage.includes('rate limit')) {
         console.warn(`[Analyzer] Hit Gemini 429 Rate/Quota Limit. Backing off aggressively for 25 seconds to allow rate limit window to clear...`);
         backoffDelay = 25000;
+      } else if (errorMessage.includes('503') || errorMessage.includes('high demand') || errorMessage.includes('unavailable')) {
+        const delay = 15000 * (i + 1); // 15s, 30s, 45s, 60s
+        console.warn(`[Analyzer] Hit Gemini 503 Service Unavailable (High Demand). Spikes are temporary. Backing off for ${delay/1000}s...`);
+        backoffDelay = delay;
       }
       
       await new Promise(r => setTimeout(r, backoffDelay));
